@@ -36,6 +36,13 @@ main()
         param_name="${project}"
     fi
 
+    local param_alias=
+    if [ -f "${projectdir}/alias" ]; then
+        param_alias=`head -1 -- "${projectdir}/alias"` || exit $?
+    else
+        param_alias="${project}"
+    fi
+
     local param_descr=
     if [ -f "${projectdir}/descr" ]; then
         param_descr=`cat -- "${projectdir}/descr"` || exit $?
@@ -316,8 +323,8 @@ _write_stage_build()
 {
     echo "### Arguments (stage: build)"
     echo
-    echo "* \`${project}_from\` (default: \`ghcr.io/appjail-makejails/${project}\`): Location of OCI image. See also [OCI Configuration](#oci-configuration)."
-    echo "* \`${project}_tag\` (default: \`latest\`): OCI image tag. See also [OCI Configuration](#oci-configuration)."
+    echo "* \`${param_alias}_from\` (default: \`ghcr.io/appjail-makejails/${project}\`): Location of OCI image. See also [OCI Configuration](#oci-configuration)."
+    echo "* \`${param_alias}_tag\` (default: \`latest\`): OCI image tag. See also [OCI Configuration](#oci-configuration)."
 }
 
 main "$@"

@@ -14,7 +14,8 @@ A substitution list is used to replace values. `templates/sub/` serves as a cent
 
 ### Keywords
 
-* `name` (optional): Project name. If not defined, the directory name is used.
+* `name` (optional): Project name. If not defined, the directory name is used. 
+* `alias` (optional): An alternative name used by operations (such as the generation of the `*_from` and `*_tag` arguments) that cannot use all characters. If not defined, the directory name is used.
 * `descr` (mandatory): Description. If there is an entry on Wikipedia, use it; otherwise, use the official one.
 * `www` (optional): Home page. If there is an entry on Wikipedia, use it; otherwise, use the official one.
 * `logo` (optional): Link to the logo.
