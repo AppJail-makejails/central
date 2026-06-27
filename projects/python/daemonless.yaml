@@ -1,0 +1,63 @@
+build:
+  variants:
+    - tag: %%BASE1%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+    - tag: %%BASE1%%-%%PYVER1%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER1%%"
+    - tag: %%BASE1%%-%%PYVER2%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER2%%"
+    - tag: %%BASE1%%-%%PYVER3%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER3%%"
+    - tag: %%BASE1%%-%%PYVER4%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER4%%"
+    - tag: %%BASE1%%-%%PYVER5%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER5%%"
+    - tag: %%BASE1%%-%%PYVER6%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER6%%"
+    - tag: %%BASE1%%-%%PYVER7%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER7%%"
+    - tag: %%BASE1%%-%%PYVER8%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER8%%"
+    - tag: %%BASE1%%-%%PYVER9%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER9%%"
+    - tag: %%BASE1%%-%%PYVER10%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER10%%"
+    - tag: %%BASE1%%-%%PYVER11%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PYVER: "%%PYVER11%%"
