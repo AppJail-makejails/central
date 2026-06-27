@@ -237,8 +237,8 @@ EOF
     fi
 
     local sub
-    for sub in "${wrksrc}/sub"/* "${BASEDIR}/../template/sub"/*; do
-        if [ "${sub}" = "${wrksrc}/sub/*" ]; then
+    for sub in "${projectdir}/sub"/* "${BASEDIR}/../template/sub"/*; do
+        if [ "${sub}" = "${projectdir}/sub/*" ]; then
             continue
         fi
 
