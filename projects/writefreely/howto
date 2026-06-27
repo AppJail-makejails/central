@@ -1,0 +1,18 @@
+```sh
+mkdir -p .volumes/writefreely-data
+appjail makejail \
+    -j writefreely \
+    -f gh+AppJail-makejails/writefreely \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o expose=80:8080 \
+    -V WRITEFREELY__APP__SITE_NAME="myblog" \
+    -V WRITEFREELY__APP__HOST="http://your-host-or-ip" \
+    -o fstab="$PWD/.volumes/writefreely-data writefreely-data <volumefs>"
+```
+
+You can configure WriteFreely through environment variables in the build stage of this Makejail by following these rules:
+
+1. Environment variables must have the form: `WRITEFREELY__SECTION_NAME__KEY_NAME`.
+2. `SECTION` and `KEY_NAME` must be in uppercase. They can contain `_` and numbers.
+3. `_0X2E_` will be replaced by `.`.
