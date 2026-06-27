@@ -1,0 +1,6 @@
+```sh
+appjail makejail \
+    -j freebsd \
+    -f gh+AppJail-makejails/base \
+    -o container="args:--pull"
+```
