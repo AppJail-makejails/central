@@ -102,6 +102,8 @@ ${param_howto}
 
 EOF
 
+    local stage_build=false
+
     local stage
     for stage in "${projectdir}/arguments"/*; do
         if [ "${stage}" = "${projectdir}/arguments/*" ]; then
@@ -110,8 +112,16 @@ EOF
 
         stage="${stage##*/}"
 
-        echo "### Arguments (stage: ${stage})"
-        echo
+        if [ "${stage}" = "build" ]; then
+            stage_build=true
+        fi
+
+        if [ "${stage}" != "build" ]; then
+            echo "### Arguments (stage: ${stage})"
+            echo
+        else
+            _write_stage_build
+        fi
 
         local stagedir
         stagedir="${projectdir}/arguments/${stage}"
@@ -151,6 +161,12 @@ EOF
         echo
     done >> "${wrksrc}/README.md" || exit $?
 
+    if ! ${stage_build}; then
+        {
+            _write_stage_build
+        } >> "${wrksrc}/README.md" || exit $?
+    fi
+
     local display_volume_header=true
     local volume
     for volume in "${projectdir}/volumes"/*; do
@@ -159,6 +175,7 @@ EOF
         fi
 
         if ${display_volume_header}; then
+            echo
             echo "### Volumes"
             echo
             echo "| Name | Owner | Group | Perm | Type | Mountpoint |"
@@ -242,6 +259,14 @@ EOF
     done
 
     return $?
+}
+
+_write_stage_build()
+{
+    echo "### Arguments (stage: build)"
+    echo
+    echo "* \`${project}_from\` (default: \`ghcr.io/appjail-makejails/${project}\`): Location of OCI image. See also [OCI Configuration](#oci-configuration)."
+    echo "* \`${project}_tag\` (default: \`latest\`): OCI image tag. See also [OCI Configuration](#oci-configuration)."
 }
 
 main "$@"
