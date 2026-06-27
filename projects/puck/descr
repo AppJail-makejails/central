@@ -1,0 +1,7 @@
+**puck** is an AppJail application that uses a very restricted, ephemeral jail to convert a potentially suspicious PDF into a trustworthy one.
+
+This application is basically a few patches for [qubes-app-linux-pdf-converter](https://github.com/QubesOS/qubes-app-linux-pdf-converter), so you are essentially using the original application; the patches are only necessary to make it work on FreeBSD. There is one subtle difference: both the client and server run inside the jail, so no dependencies need to be installed for the client to work. Just run the Makejail file as described below.
+
+For more details, please see the article in which this concept was originally introduced:
+
+http://blog.invisiblethings.org/2013/02/21/converting-untrusted-pdfs-into-trusted.html

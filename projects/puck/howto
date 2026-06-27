@@ -1,0 +1,10 @@
+```console
+# appjail makejail \
+    -f gh+AppJail-makejails/puck \
+    -o container="args:--pull" \
+    -- \
+    --puck_file /path/to/your/suspicious/file.pdf
+...
+# xdg-open file.trusted.pdf
+...
+```
