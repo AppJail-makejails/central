@@ -172,6 +172,55 @@ main()
             _write_stage_build
         fi
 
+        local stage
+        for stage in "${projectdir}/environment"/*; do
+            if [ "${stage}" = "${projectdir}/environment/*" ]; then
+                break
+            fi
+
+            stage="${stage##*/}"
+
+            echo "### Environment (stage: ${stage})"
+            echo
+
+            local stagedir
+            stagedir="${projectdir}/environment/${stage}"
+
+            local arg_name
+            for arg_name in "${stagedir}"/*; do
+                arg_name="${arg_name##*/}"
+
+                local argdir
+                argdir="${stagedir}/${arg_name}"
+
+                local arg_type="optional"
+                if [ -f "${argdir}/mandatory" ]; then
+                    arg_type="mandatory"
+                fi
+
+                local arg_default=
+                if [ -f "${argdir}/default" ]; then
+                    arg_default=`head -1 -- "${argdir}/default"` || exit $?
+                fi
+
+                local arg_descr=
+                if [ -f "${argdir}/descr" ]; then
+                    arg_descr=`head -1 -- "${argdir}/descr"` || exit $?
+                else
+                    echo "missing: ${argdir}/descr"
+                    exit 1
+                fi
+
+                if [ -n "${arg_default}" ]; then
+                    echo "* \`${arg_name}\` (default: \`${arg_default}\`): ${arg_descr}"
+                else
+                    echo "* \`${arg_name}\` (${arg_type}): ${arg_descr}"
+                fi
+            done
+
+            echo
+        done
+
         local display_volume_header=true
         local volume
         for volume in "${projectdir}/volumes"/*; do
