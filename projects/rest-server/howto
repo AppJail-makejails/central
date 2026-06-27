@@ -1,0 +1,28 @@
+### Basic usage
+
+```sh
+mkdir -p volumes/rest-server
+appjail makejail \
+    -j rest-server \
+    -f gh+AppJail-makejails/rest-server \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o expose=8000 \
+    -o fstab="$PWD/volumes/rest-server /var/db/restserver" \
+    -o container="args:--pull"
+```
+
+### Adding users
+
+```sh
+# Password from prompt.
+appjail cmd jexec rest-server create_user myuser
+# Read password from command line.
+appjail cmd jexec rest-server create_user myuser passwd321@
+```
+
+### Deleting users
+
+```sh
+appjail cmd jexec rest-server delete_user myuser
+```
