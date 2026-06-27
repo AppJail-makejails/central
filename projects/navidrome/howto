@@ -1,0 +1,52 @@
+### Standalone
+
+```
+appjail makejail \
+    -j navidrome \
+    -f gh+AppJail-makejails/navidrome \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o expose="4533" \
+    -o container="args:--pull"
+appjail start navidrome
+```
+
+### Deploy using appjail-director
+
+**.env**:
+
+```
+DIRECTOR_PROJECT=navidrome
+```
+
+**appjail-director.yml**:
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+services:
+  navidrome:
+    name: navidrome
+    makejail: gh+AppJail-makejails/navidrome
+    arguments:
+      - puid: 1000
+      - pgid: 1000
+    options:
+      - expose: 4533
+      - container: 'args:--pull'
+    oci:
+      environment:
+        - ND_SCANSCHEDULE: 1h
+        - ND_LOGLEVEL: info
+        - ND_SESSIONTIMEOUT: 24h
+    volumes:
+      - nd_db: navidrome-db
+      - nd_music: navidrome-music
+default_volume_type: '<volumefs>'
+volumes:
+  nd_db:
+    device: /var/appjail-volumes/navidrome/db
+  nd_music:
+    device: /var/appjail-volumes/navidrome/music
+```
