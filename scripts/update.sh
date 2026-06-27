@@ -87,154 +87,156 @@ main()
     mkdir -p -- "${wrksrc}/.daemonless" || exit $?
     printf "%s" "${param_daemonless}" > "${wrksrc}/.daemonless/config.yaml" || exit $?
 
-    cat << EOF > "${wrksrc}/README.md" || exit $?
-# ${param_name}
+    {
+        printf "# %s\n" "${param_name}"
+        printf "\n"
+        printf "%s\n" "${param_descr}"
+        printf "\n"
 
-${param_descr}
-
-${param_www}
-
-<img src="${param_logo}" width="30%" height="auto" alt="${param_name} logo">
-
-## How to use this Makejail
-
-${param_howto}
-
-EOF
-
-    local stage_build=false
-
-    local stage
-    for stage in "${projectdir}/arguments"/*; do
-        if [ "${stage}" = "${projectdir}/arguments/*" ]; then
-            break
+        if [ -n "${param_www}" ]; then
+            printf "%s\n" "${param_www}"
+            printf "\n"
         fi
 
-        stage="${stage##*/}"
-
-        if [ "${stage}" = "build" ]; then
-            stage_build=true
+        if [ -n "${param_logo}" ]; then
+            printf "<img src=\"%s\" width=\"30%%\" height=\"auto\" alt=\"%s logo\">\n" \
+                "${param_logo}" "${param_name}"
+            printf "\n"
         fi
 
-        if [ "${stage}" != "build" ]; then
-            echo "### Arguments (stage: ${stage})"
+        printf "## How to use this Makejail\n"
+        printf "\n"
+        printf "%s\n" "${param_howto}"
+        printf "\n"
+
+        local stage_build=false
+
+        local stage
+        for stage in "${projectdir}/arguments"/*; do
+            if [ "${stage}" = "${projectdir}/arguments/*" ]; then
+                break
+            fi
+
+            stage="${stage##*/}"
+
+            if [ "${stage}" = "build" ]; then
+                stage_build=true
+            fi
+
+            if [ "${stage}" != "build" ]; then
+                echo "### Arguments (stage: ${stage})"
+                echo
+            else
+                _write_stage_build
+            fi
+
+            local stagedir
+            stagedir="${projectdir}/arguments/${stage}"
+
+            local arg_name
+            for arg_name in "${stagedir}"/*; do
+                arg_name="${arg_name##*/}"
+
+                local argdir
+                argdir="${stagedir}/${arg_name}"
+
+                local arg_type="optional"
+                if [ -f "${argdir}/mandatory" ]; then
+                    arg_type="mandatory"
+                fi
+
+                local arg_default=
+                if [ -f "${argdir}/default" ]; then
+                    arg_default=`head -1 -- "${argdir}/default"` || exit $?
+                fi
+
+                local arg_descr=
+                if [ -f "${argdir}/descr" ]; then
+                    arg_descr=`head -1 -- "${argdir}/descr"` || exit $?
+                else
+                    echo "missing: ${argdir}/descr"
+                    exit 1
+                fi
+
+                if [ -n "${arg_default}" ]; then
+                    echo "* \`${arg_name}\` (default: \`${arg_default}\`): ${arg_descr}"
+                else
+                    echo "* \`${arg_name}\` (${arg_type}): ${arg_descr}"
+                fi
+            done
+
             echo
-        else
-            _write_stage_build
-        fi
-
-        local stagedir
-        stagedir="${projectdir}/arguments/${stage}"
-
-        local arg_name
-        for arg_name in "${stagedir}"/*; do
-            arg_name="${arg_name##*/}"
-
-            local argdir
-            argdir="${stagedir}/${arg_name}"
-
-            local arg_type="optional"
-            if [ -f "${argdir}/mandatory" ]; then
-                arg_type="mandatory"
-            fi
-
-            local arg_default=
-            if [ -f "${argdir}/default" ]; then
-                arg_default=`head -1 -- "${argdir}/default"` || exit $?
-            fi
-
-            local arg_descr=
-            if [ -f "${argdir}/descr" ]; then
-                arg_descr=`head -1 -- "${argdir}/descr"` || exit $?
-            else
-                echo "missing: ${argdir}/descr"
-                exit 1
-            fi
-
-            if [ -n "${arg_default}" ]; then
-                echo "* \`${arg_name}\` (default: \`${arg_default}\`): ${arg_descr}"
-            else
-                echo "* \`${arg_name}\` (${arg_type}): ${arg_descr}"
-            fi
         done
 
-        echo
-    done >> "${wrksrc}/README.md" || exit $?
-
-    if ! ${stage_build}; then
-        {
+        if ! ${stage_build}; then
             _write_stage_build
-        } >> "${wrksrc}/README.md" || exit $?
-    fi
-
-    local display_volume_header=true
-    local volume
-    for volume in "${projectdir}/volumes"/*; do
-        if [ "${volume}" = "${projectdir}/volumes/*" ]; then
-            break
         fi
 
-        if ${display_volume_header}; then
-            echo
-            echo "### Volumes"
-            echo
-            echo "| Name | Owner | Group | Perm | Type | Mountpoint |"
-            echo "| --- | --- | --- | --- | --- | --- |"
+        local display_volume_header=true
+        local volume
+        for volume in "${projectdir}/volumes"/*; do
+            if [ "${volume}" = "${projectdir}/volumes/*" ]; then
+                break
+            fi
 
-            display_volume_header=false
-        fi
+            if ${display_volume_header}; then
+                echo
+                echo "### Volumes"
+                echo
+                echo "| Name | Owner | Group | Perm | Type | Mountpoint |"
+                echo "| --- | --- | --- | --- | --- | --- |"
 
-        volume="${volume##*/}"
+                display_volume_header=false
+            fi
 
-        local volumedir
-        volumedir="${projectdir}/volumes/${volume}"
+            volume="${volume##*/}"
 
-        local volume_owner="\`\${puid}\`"
-        if [ -f "${volumedir}/owner" ]; then
-            volume_owner=`head -1 -- "${volumedir}/owner"` || exit $?
-        fi
+            local volumedir
+            volumedir="${projectdir}/volumes/${volume}"
 
-        local volume_group="\`\${pgid}\`"
-        if [ -f "${volumedir}/group" ]; then
-            volume_group=`head -1 -- "${volumedir}/group"` || exit $?
-        fi
+            local volume_owner="\`\${puid}\`"
+            if [ -f "${volumedir}/owner" ]; then
+                volume_owner=`head -1 -- "${volumedir}/owner"` || exit $?
+            fi
 
-        local volume_perm="-"
-        if [ -f "${volumedir}/perm" ]; then
-            volume_perm=`head -1 -- "${volumedir}/perm"` || exit $?
-        fi
+            local volume_group="\`\${pgid}\`"
+            if [ -f "${volumedir}/group" ]; then
+                volume_group=`head -1 -- "${volumedir}/group"` || exit $?
+            fi
 
-        local volume_type="-"
-        if [ -f "${volumedir}/type" ]; then
-            volume_type=`head -1 -- "${volumedir}/type"` || exit $?
-        fi
+            local volume_perm="-"
+            if [ -f "${volumedir}/perm" ]; then
+                volume_perm=`head -1 -- "${volumedir}/perm"` || exit $?
+            fi
 
-        local volume_mountpoint="-"
-        if [ -f "${volumedir}/mountpoint" ]; then
-            volume_mountpoint=`head -1 -- "${volumedir}/mountpoint"` || exit $?
-        fi
+            local volume_type="-"
+            if [ -f "${volumedir}/type" ]; then
+                volume_type=`head -1 -- "${volumedir}/type"` || exit $?
+            fi
 
-        echo "| ${volume} | ${volume_owner} | ${volume_group} | ${volume_perm} | ${volume_type} | ${volume_mountpoint} |"
-    done >> "${wrksrc}/README.md" || exit $?
+            local volume_mountpoint="-"
+            if [ -f "${volumedir}/mountpoint" ]; then
+                volume_mountpoint=`head -1 -- "${volumedir}/mountpoint"` || exit $?
+            fi
 
-    {
+            echo "| ${volume} | ${volume_owner} | ${volume_group} | ${volume_perm} | ${volume_type} | ${volume_mountpoint} |"
+        done
+
         echo
         echo "## OCI Configuration"
         echo
         echo "\`\`\`yaml"
         printf "%s\n" "${param_daemonless}"
         echo "\`\`\`"
-    } >> "${wrksrc}/README.md" || exit $?
 
-    if [ -n "${param_notes}" ]; then
-        {
+        if [ -n "${param_notes}" ]; then
             echo
             echo "## Notes"
             echo
 
             printf "%s\n" "${param_notes}"
-        } >> "${wrksrc}/README.md" || exit $?
-    fi
+        fi
+    } > "${wrksrc}/README.md" || exit $?
 
     local sub
     for sub in "${projectdir}/sub"/* "${BASEDIR}/../template/sub"/*; do
