@@ -33,6 +33,10 @@ main()
     local wrksrc
     wrksrc="${wrkdir}/${project}"
 
+    echo >&2
+    echo "[${project}]:" >&2
+    echo >&2
+
     git -C "${wrksrc}" "$@"
 
     return $?
