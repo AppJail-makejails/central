@@ -1,0 +1,18 @@
+build:
+  variants:
+    - tag: %%BASE1%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+    - tag: %%BASE1%%-%%GOVER1%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        GOVER: "%%GOVER1%%"
+    - tag: %%BASE1%%-%%GOVER2%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        GOVER: "%%GOVER2%%"

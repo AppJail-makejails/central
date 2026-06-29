@@ -1,0 +1,2 @@
+1. `/go` is world-writable to allow flexibility in the user which runs the container (for example, in a container started with `--user 1000:1000`, running `go get github.com/example/...` into the default `$GOPATH` will succeed). While the `777` directory would be insecure on a regular host setup, there are not typically other processes or users inside the container, so this is equivalent to `700` for Podman usage, but allowing for `--user` flexibility.
+2. The ideas present in the Docker image of Go are taken into account for users who are familiar with it.

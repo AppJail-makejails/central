@@ -1,0 +1,47 @@
+### Start a Go instance in your app
+
+The most straightforward way to use this image is to use a Go container as both the build and runtime environment. In your `Containerfile`, writing something along the lines of the following will compile and run your project (assuming it uses `go.mod` for dependency management):
+
+```dockerfile
+FROM ghcr.io/appjail-makejails/go
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN go build -v -o /usr/local/bin/app ./...
+
+CMD ["app"]
+```
+
+You can then build and run the OCI image:
+
+```console
+$ buildah build --network=host -t my-golang-app .
+$ appjail oci run \
+    -o overwrite=force \
+    -o ephemeral \
+    -o alias \
+    -o ip4_inherit \
+    localhost/my-golang-app my-golang-app
+```
+
+### Compile your app inside the container
+
+There may be occasions where it is not appropriate to run your app inside a container. To compile, but not run your app inside the container instance, you can write something like:
+
+```console
+$ appjail oci run \
+    -o overwrite=force \
+    -o ephemeral \
+    -o alias \
+    -o ip4_inherit \
+    -o fstab="$PWD /myapp" \
+    -w /myapp \
+    localhost/my-golang-app my-golang-app \
+    go build -v
+$ ls ./myapp
+./myapp
+```
