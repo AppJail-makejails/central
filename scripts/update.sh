@@ -92,7 +92,7 @@ main()
     sed -i '' -Ee "s#%%NAME%%#${escape_project}#g" "${wrksrc}/.github/workflows/build.yaml" || exit $?
 
     mkdir -p -- "${wrksrc}/.daemonless" || exit $?
-    printf "%s" "${param_daemonless}" > "${wrksrc}/.daemonless/config.yaml" || exit $?
+    printf "%s\n" "${param_daemonless}" > "${wrksrc}/.daemonless/config.yaml" || exit $?
 
     {
         printf "# %s\n" "${param_name}"
