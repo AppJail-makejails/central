@@ -56,7 +56,8 @@ $ appjail makejail \
     -f gh+AppJail-makejails/go \
     -o alias \
     -o ip4_inherit \
-    -o ephemeral
+    -o ephemeral \
+    -o container="args:--pull"
 ...
 $ appjail cmd jexec golang go version
 go version go1.25.11 freebsd/amd64
