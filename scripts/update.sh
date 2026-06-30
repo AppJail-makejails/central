@@ -177,6 +177,7 @@ main()
 
         if ! ${stage_build}; then
             _write_stage_build
+            echo
         fi
 
         local stage
