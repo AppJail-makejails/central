@@ -1,0 +1,1 @@
+When set, php-fpm runs instead of the PHP CLI, with `/usr/local/www` as the working directory.

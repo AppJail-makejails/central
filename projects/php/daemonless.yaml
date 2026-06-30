@@ -1,0 +1,22 @@
+build:
+  variants:
+    - tag: %%BASE1%%-%%PHPVER1%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PHPVER: "%%PHPVER1%%"
+    - tag: %%BASE1%%-%%PHPVER2%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PHPVER: "%%PHPVER2%%"
+    - tag: %%BASE1%%-%%PHPVER3%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PHPVER: "%%PHPVER3%%"
+    - tag: %%BASE1%%-%%PHPVER4%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PHPVER: "%%PHPVER4%%"

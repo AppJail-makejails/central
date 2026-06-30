@@ -1,0 +1,1 @@
+1. This image installs `php.ini-production` as `php.ini`. You can always override or customize these settings.

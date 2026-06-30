@@ -1,0 +1,36 @@
+### Create a `Containerfile` in your PHP project
+
+```dockerfile
+FROM ghcr.io/appjail-makejails/php:%%BASE1%%-%%PHPVER4%%
+COPY . /myapp
+WORKDIR /myapp
+CMD ["php", "./your-script.php"]
+```
+
+Then, run the commands to build and run the OCI image:
+
+```console
+$ buildah build --network=host -t my-php-app .
+$ appjail oci run \
+    -o overwrite=force \
+    -o ephemeral \
+    -o alias \
+    -o ip4_inherit \
+    localhost/my-php-app my-php-app
+```
+
+### Run a single PHP script
+
+For many simple, single file projects, you may find it inconvenient to write a complete `Containerfile`. In such cases, you can run a PHP script by using the PHP OCI image directly:
+
+```console
+$ appjail oci run \
+    -o overwrite=force \
+    -o ephemeral \
+    -o alias \
+    -o ip4_inherit \
+    -o fstab="$PWD /myapp" \
+    -w /myapp \
+    ghcr.io/appjail-makejails/php:%%BASE1%%-%%PHPVER4%% my-php-app \
+    php your-script.php
+```
