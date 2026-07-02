@@ -47,7 +47,7 @@ main()
     if [ -f "${projectdir}/descr" ]; then
         param_descr=`cat -- "${projectdir}/descr"` || exit $?
     else
-        echo "missing: ${projectdir}/descr"
+        echo "missing: ${projectdir}/descr" >&2
         exit 1
     fi
 
@@ -65,7 +65,7 @@ main()
     if [ -f "${projectdir}/howto" ]; then
         param_howto=`cat -- "${projectdir}/howto"` || exit $?
     else
-        echo "missing: ${projectdir}/howto"
+        echo "missing: ${projectdir}/howto" >&2
         exit 1
     fi
 
@@ -161,7 +161,7 @@ main()
                 if [ -f "${argdir}/descr" ]; then
                     arg_descr=`head -1 -- "${argdir}/descr"` || exit $?
                 else
-                    echo "missing: ${argdir}/descr"
+                    echo "missing: ${argdir}/descr" >&2
                     exit 1
                 fi
 
@@ -215,7 +215,7 @@ main()
                 if [ -f "${argdir}/descr" ]; then
                     arg_descr=`head -1 -- "${argdir}/descr"` || exit $?
                 else
-                    echo "missing: ${argdir}/descr"
+                    echo "missing: ${argdir}/descr" >&2
                     exit 1
                 fi
 
