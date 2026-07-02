@@ -1,0 +1,1 @@
+Equivalent to `NGINX_ENVSUBST_OUTPUT_DIR` but for the [stream](https://nginx.org/en/docs/stream/ngx_stream_core_module.html) block.

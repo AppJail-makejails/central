@@ -1,0 +1,1 @@
+If set, the `NGINX_LOCAL_RESOLVERS` environment variable will contain the name servers extracted from the jail's `/etc/resolv.conf` file, so that templates can configure the [resolver](https://nginx.org/en/docs/http/ngx_http_core_module.html#resolver).
