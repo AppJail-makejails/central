@@ -1,0 +1,33 @@
+build:
+  variants:
+    - tag: %%BASE1%%-%%APACHEVER1%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        APACHEVER: "%%APACHEVER1%%"
+    - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER1%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        APACHEVER: "%%APACHEVER1%%"
+        PHPVER: "%%PHPVER1%%"
+    - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER2%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        APACHEVER: "%%APACHEVER1%%"
+        PHPVER: "%%PHPVER2%%"
+    - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER3%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        APACHEVER: "%%APACHEVER1%%"
+        PHPVER: "%%PHPVER3%%"
+    - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER4%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        APACHEVER: "%%APACHEVER1%%"
+        PHPVER: "%%PHPVER4%%"

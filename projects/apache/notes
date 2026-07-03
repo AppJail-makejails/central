@@ -1,0 +1,1 @@
+1. `/var/log/httpd-error.log` has a symbolic link to `/dev/stderr`, as do `/var/log/httpd-access.log` and `/var/log/httpd-ssl_request.log`, which has a symbolic link to `/dev/stdout`.
