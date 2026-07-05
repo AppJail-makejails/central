@@ -7,27 +7,37 @@ build:
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         APACHEVER: "%%APACHEVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE%%"]
     - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER1%%
       containerfile: Containerfile
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         APACHEVER: "%%APACHEVER1%%"
         PHPVER: "%%PHPVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE%%"]
     - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER2%%
       containerfile: Containerfile
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         APACHEVER: "%%APACHEVER1%%"
         PHPVER: "%%PHPVER2%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE%%"]
     - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER3%%
       containerfile: Containerfile
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         APACHEVER: "%%APACHEVER1%%"
         PHPVER: "%%PHPVER3%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE%%"]
     - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER4%%
       containerfile: Containerfile
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         APACHEVER: "%%APACHEVER1%%"
         PHPVER: "%%PHPVER4%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE%%"]
