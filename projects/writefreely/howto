@@ -1,14 +1,17 @@
-```sh
-mkdir -p .volumes/writefreely-data
-appjail makejail \
-    -j writefreely \
-    -f gh+AppJail-makejails/writefreely \
+```console
+$ mkdir -p /var/appjail-volumes/writefreely/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
     -o virtualnet=":<random> default" \
     -o nat \
     -o expose=80:8080 \
-    -V WRITEFREELY__APP__SITE_NAME="myblog" \
-    -V WRITEFREELY__APP__HOST="http://your-host-or-ip" \
-    -o fstab="$PWD/.volumes/writefreely-data writefreely-data <volumefs>"
+    -o fstab="/var/appjail-volumes/writefreely/data /data" \
+    -o container="args:--pull" \
+    -e PUID=1000 \
+    -e PGID=1000 \
+    -e WRITEFREELY__APP__SITE_NAME="myblog" \
+    -e WRITEFREELY__APP__HOST="http://your-host-or-ip" \
+    ghcr.io/appjail-makejails/writefreely writefreely
 ```
 
 You can configure WriteFreely through environment variables in the build stage of this Makejail by following these rules:
