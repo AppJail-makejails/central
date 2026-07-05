@@ -17,6 +17,8 @@ build:
         PHPVER: "%%PHPVER3%%"
     - tag: %%BASE1%%-%%PHPVER4%%
       containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         PHPVER: "%%PHPVER4%%"
