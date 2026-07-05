@@ -1,14 +1,22 @@
 ### Standalone
 
-```
-appjail makejail \
-    -j navidrome \
-    -f gh+AppJail-makejails/navidrome \
+```console
+$ mkdir -p /var/appjail-volumes/navidrome/data \
+    /var/appjail-volumes/navidrome/music
+$ appjail oci run -Pd \
+    -e PUID=1000 \
+    -e PGID=1000 \
+    -e ND_SCANSCHEDULE="1h" \
+    -e ND_LOGLEVEL="info" \
+    -e ND_SESSIONTIMEOUT="24h" \
+    -o overwrite=force \
     -o virtualnet=":<random> default" \
     -o nat \
-    -o expose="4533" \
-    -o container="args:--pull"
-appjail start navidrome
+    -o expose=4533 \
+    -o container="args:--pull" \
+    -o fstab="/var/appjail-volumes/navidrome/data /data" \
+    -o fstab="/var/appjail-volumes/navidrome/music /music nullfs ro" \
+    ghcr.io/appjail-makejails/navidrome navidrome
 ```
 
 ### Deploy using appjail-director
@@ -29,24 +37,23 @@ services:
   navidrome:
     name: navidrome
     makejail: gh+AppJail-makejails/navidrome
-    arguments:
-      - puid: 1000
-      - pgid: 1000
     options:
       - expose: 4533
-      - container: 'args:--pull'
+      - container: 'boot args:--pull'
     oci:
       environment:
         - ND_SCANSCHEDULE: 1h
         - ND_LOGLEVEL: info
         - ND_SESSIONTIMEOUT: 24h
+        - PUID: 1000
+        - PGID: 1000
     volumes:
-      - nd_db: navidrome-db
-      - nd_music: navidrome-music
-default_volume_type: '<volumefs>'
+      - nd_data: /data
+      - nd_music: /music
 volumes:
-  nd_db:
-    device: /var/appjail-volumes/navidrome/db
+  nd_data:
+    device: /var/appjail-volumes/navidrome/data
   nd_music:
     device: /var/appjail-volumes/navidrome/music
+    options: ro
 ```
