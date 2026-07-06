@@ -1,28 +1,32 @@
 ### Basic usage
 
-```sh
-mkdir -p volumes/rest-server
-appjail makejail \
-    -j rest-server \
-    -f gh+AppJail-makejails/rest-server \
+```console
+$ mkdir -p /var/appjail-volumes/rest-server/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
     -o virtualnet=":<random> default" \
     -o nat \
-    -o expose=8000 \
-    -o fstab="$PWD/volumes/rest-server /var/db/restserver" \
-    -o container="args:--pull"
+    -o container="args:--pull" \
+    -o fstab="/var/appjail-volumes/rest-server/data /data" \
+    ghcr.io/appjail-makejails/rest-server rest-server
 ```
 
 ### Adding users
 
-```sh
-# Password from prompt.
-appjail cmd jexec rest-server create_user myuser
-# Read password from command line.
-appjail cmd jexec rest-server create_user myuser passwd321@
+**Password from prompt**:
+
+```console
+$ appjail oci exec rest-server create_user myuser passwd321@
+```
+
+**Read password from command line**:
+
+```console
+$ appjail oci exec rest-server create_user myuser
 ```
 
 ### Deleting users
 
-```sh
-appjail cmd jexec rest-server delete_user myuser
+```console
+$ appjail oci exec rest-server delete_user myuser
 ```

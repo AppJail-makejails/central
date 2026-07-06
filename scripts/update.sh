@@ -72,7 +72,7 @@ main()
     local param_notes=
     if [ -f "${projectdir}/notes" ]; then
         param_notes=`cat -- "${projectdir}/notes"` || exit $?
-    else
+    elif [ -f "${BASEDIR}/../templates/notes" ]; then
         param_notes=`cat -- "${BASEDIR}/../template/notes"` || exit $?
     fi
 
@@ -180,6 +180,60 @@ main()
             echo
         fi
 
+        local display_env_header=true
+        local envdir
+        for envdir in "${projectdir}/oci/environment"/* "${BASEDIR}/../template/oci/environment"/*; do
+            if [ "${envdir}" = "${projectdir}/oci/environment/*" ]; then
+                continue
+            fi
+
+            if [ "${envdir}" = "${BASEDIR}/../template/oci/environment/*" ]; then
+                continue
+            fi
+
+            local envdir_root
+            envdir_root=`dirname -- "${envdir}"` || exit $?
+
+            if [ -f "${projectdir}/oci/empty_env" ] && \
+                    [ "${envdir_root}" = "${BASEDIR}/../template/oci/environment" ]; then
+                continue
+            fi
+
+            if ${display_env_header}; then
+                echo "### Environment (OCI image)"
+                echo
+
+                display_env_header=false
+            fi
+
+            local env
+            env="${envdir##*/}"
+
+            local env_type="optional"
+            if [ -f "${envdir}/mandatory" ]; then
+                env_type="mandatory"
+            fi
+
+            local env_default=
+            if [ -f "${envdir}/default" ]; then
+                env_default=`head -1 -- "${envdir}/default"` || exit $?
+            fi
+
+            local env_descr=
+            if [ -f "${envdir}/descr" ]; then
+                env_descr=`head -1 -- "${envdir}/descr"` || exit $?
+            else
+                echo "missing: ${envdir}/descr" >&2
+                exit 1
+            fi
+
+            if [ -n "${env_default}" ]; then
+                echo "* \`${env}\` (default: \`${env_default}\`): ${env_descr}"
+            else
+                echo "* \`${env}\` (${env_type}): ${env_descr}"
+            fi
+        done
+
         local stage
         for stage in "${projectdir}/environment"/*; do
             if [ "${stage}" = "${projectdir}/environment/*" ]; then
@@ -251,12 +305,12 @@ main()
             local volumedir
             volumedir="${projectdir}/volumes/${volume}"
 
-            local volume_owner="\`\${puid}\`"
+            local volume_owner="\`\${PUID}\`"
             if [ -f "${volumedir}/owner" ]; then
                 volume_owner=`head -1 -- "${volumedir}/owner"` || exit $?
             fi
 
-            local volume_group="\`\${pgid}\`"
+            local volume_group="\`\${PGID}\`"
             if [ -f "${volumedir}/group" ]; then
                 volume_group=`head -1 -- "${volumedir}/group"` || exit $?
             fi

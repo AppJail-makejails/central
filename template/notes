@@ -1,1 +1,0 @@
-1. This image already drops privileges and runs the process as a custom user named `noroot`, whose `UID` and `GID` are specified by the `PUID` or `PGID` environment variables, both of which have a default value of `1000`.

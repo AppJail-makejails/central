@@ -1,0 +1,1 @@
+By default, the image uses authentication. To turn it off, set this environment variable to any value.

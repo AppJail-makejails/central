@@ -6,8 +6,12 @@ build:
       default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-nightly
       containerfile: Containerfile
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         NIGHTLY: 'yes'
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]

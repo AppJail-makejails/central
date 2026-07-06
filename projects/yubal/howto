@@ -1,13 +1,15 @@
 ### Standalone
 
 ```console
-appjail makejail \
-    -j yubal \
-    -f gh+AppJail-makejails/yubal \
+$ appjail oci run -Pd \
+    -o overwrite=force \
     -o virtualnet=":<random> default" \
     -o nat \
-    -o container="args:--pull"
-appjail start yubal
+    -o container="args:--pull" \
+    -o expose=8000 \
+    -e PUID=1000 \
+    -e PGID=1000 \
+    ghcr.io/appjail-makejails/yubal yubal
 ```
 
 ### Deploy using appjail-director
@@ -28,19 +30,18 @@ services:
   yubal:
     name: yubal
     makejail: gh+AppJail-makejails/yubal
-    arguments:
-      - puid: 1000
-      - pgid: 1000
     oci:
       environment:
         - YUBAL_PORT: 8000
         - YUBAL_TZ: America/Caracas
+        - PUID: 1000
+        - PGID: 1000
     options:
-      - expose: '8000:8000'
-      - container: 'args:--pull'
+      - expose: '8000'
+      - container: 'boot args:--pull'
     volumes:
-      - data: yubal-data
-      - config: yubal-config
+      - data: /data
+      - config: /config
 default_volume_type: '<volumefs>'
 volumes:
   data:

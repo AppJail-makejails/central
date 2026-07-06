@@ -7,3 +7,5 @@ build:
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         PYVER: "%%PYVER%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]

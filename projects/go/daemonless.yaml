@@ -6,13 +6,19 @@ build:
       default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-%%GOVER1%%
       containerfile: Containerfile
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         GOVER: "%%GOVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-%%GOVER2%%
       containerfile: Containerfile
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         GOVER: "%%GOVER2%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]

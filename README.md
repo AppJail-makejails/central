@@ -22,12 +22,14 @@ A substitution list is used to replace values. `templates/sub/` serves as a cent
 * `howto` (mandatory): A detailed explanation of how to use the Makejail. Use markdown.
 * `arguments/{stage}/{name}/` (optional): Arguments used at each different stages. Name in lowercase.
 * `environment/{stage}/{name}/` (optional): Environment variables used at each different stages. Name in lowercase.
+* `oci/environment/{name}/` (optional): Environment variables used by the OCI image.
+* `oc/empty_env` (optional): An empty file that, when present, don't add default environment variables.
 * `volumes/{name}/` (optional): Volumes used by this Makejail.
 * `notes` (optional): Notes and extra information about this Makejail. Use markdown.
 * `sub/{name}` (optional): Substitution list. Name in uppercase.
 * `daemonless.yaml` (optional): dbuild configuration to build OCI images.
 
-#### Keywords: {arguments,environment}/{stage}/{name}/
+#### Keywords: {oci/environment,{arguments,environment}/{stage}}/{name}/
 
 * `name` (mandatory): Parameter name.
 * `mandatory` (optional): An empty file that, when present, makes the parameter required. This has no effect if `default` is set.
