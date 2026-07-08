@@ -41,3 +41,11 @@ build:
         PHPVER: "%%PHPVER4%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%APACHEVER1%%-php%%PHPVER5%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        APACHEVER: "%%APACHEVER1%%"
+        PHPVER: "%%PHPVER5%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
