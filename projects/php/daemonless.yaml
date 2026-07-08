@@ -23,10 +23,17 @@ build:
       cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-%%PHPVER4%%
       containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PHPVER: "%%PHPVER4%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%PHPVER5%%
+      containerfile: Containerfile
       aliases: ["latest"]
       default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
-        PHPVER: "%%PHPVER4%%"
+        PHPVER: "%%PHPVER5%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
