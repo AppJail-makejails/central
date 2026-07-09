@@ -1,0 +1,19 @@
+build:
+  variants:
+    - tag: %%BASE1%%-apache
+      containerfile: Containerfile.apache
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        APACHEVER: "%%APACHEVER1%%"
+        PHPVER: "%%PHPVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-fpm
+      containerfile: Containerfile.fpm
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        PHPVER: "%%PHPVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]

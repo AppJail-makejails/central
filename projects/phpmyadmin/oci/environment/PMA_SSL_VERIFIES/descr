@@ -1,0 +1,1 @@
+comma-separated list of `0` and `1` to enable or disable SSL certificate verification for multiple MySQL connections.

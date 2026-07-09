@@ -1,0 +1,1 @@
+in the context of mutual TLS security, allows setting your CA certificate file as a string inside the default `config.inc.php`.

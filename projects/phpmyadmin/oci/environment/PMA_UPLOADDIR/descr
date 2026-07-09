@@ -1,0 +1,1 @@
+if defined, this option will set the path where files can be saved to be available to import ([$cfg\['UploadDir'\]](https://docs.phpmyadmin.net/en/latest/config.html#cfg_UploadDir)).

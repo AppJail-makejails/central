@@ -1,0 +1,1 @@
+if set, this option will override the default value for apache and php-fpm (format as `[0-9+](K,M,G)`, this will change `upload_max_filesize` and `post_max_size` values).

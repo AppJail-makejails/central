@@ -1,0 +1,1 @@
+comma separated list of `0` and `1` defining SSL usage for the corresponding MySQL connections.

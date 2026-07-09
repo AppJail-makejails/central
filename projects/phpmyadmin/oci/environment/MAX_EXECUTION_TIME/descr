@@ -1,0 +1,1 @@
+if set, will override the maximum execution time in seconds for phpMyAdmin ([$cfg\['ExecTimeLimit'\]](https://docs.phpmyadmin.net/en/latest/config.html#cfg_MemoryLimit)) and PHP [max_execution_time](https://www.php.net/manual/en/info.configuration.php#ini.max-execution-time) (format as `[0-9+]`).

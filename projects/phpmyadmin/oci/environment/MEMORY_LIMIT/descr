@@ -1,0 +1,1 @@
+if set, will override the memory limit for phpMyAdmin ([$cfg\['MemoryLimit'\]](https://docs.phpmyadmin.net/en/latest/config.html#cfg_MemoryLimit)) and PHP [memory_limit](https://www.php.net/manual/en/ini.core.php#ini.memory-limit) (format as `[0-9+](K,M,G)` where K is for Kilobytes, M for Megabytes, G for Gigabytes and 1K = 1024 bytes).

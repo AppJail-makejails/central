@@ -1,0 +1,1 @@
+in the context of mutual TLS security, allows setting multiple private key files as a comma-separated list of strings inside the default `config.inc.php`.

@@ -1,0 +1,1 @@
+if defined, this option will set the path where exported files can be saved ([$cfg\['SaveDir'\]](https://docs.phpmyadmin.net/en/latest/config.html#cfg_SaveDir)).

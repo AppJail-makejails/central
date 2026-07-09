@@ -1,0 +1,25 @@
+1. Variables that can store the file contents using `_BASE64`:
+
+   * `PMA_SSL_CA`
+   * `PMA_SSL_CAS`
+   * `PMA_SSL_KEY`
+   * `PMA_SSL_KEYS`
+   * `PMA_SSL_CERT`
+   * `PMA_SSL_CERTS`
+
+   Also includes: `PMA_CONFIG_BASE64` or `PMA_USER_CONFIG_BASE64`.
+
+   For example, the variable would be named `PMA_SSL_CA_BASE64` and the value is the base64 encoded contents of the file.
+2. Variables that can be read from a file using `_FILE`:
+   
+   * `MYSQL_ROOT_PASSWORD`
+   * `MYSQL_PASSWORD`
+   * `PMA_USER`
+   * `PMA_PASSWORD`
+   * `PMA_HOSTS`
+   * `PMA_HOST`
+   * `PMA_CONTROLHOST`
+   * `PMA_CONTROLUSER`
+   * `PMA_CONTROLPASS`
+3. For more detailed documentation see https://docs.phpmyadmin.net/en/latest/setup.html#installing-using-docker
+4. The ideas present in the Docker image of phpMyAdmin are taken into account for users who are familiar with it.
