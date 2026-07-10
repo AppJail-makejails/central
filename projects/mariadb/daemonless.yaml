@@ -1,0 +1,39 @@
+build:
+  variants:
+    - tag: %%BASE1%%-%%MARIADBVER1%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        MARIADBVER: "%%MARIADBVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%MARIADBVER2%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        MARIADBVER: "%%MARIADBVER2%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%MARIADBVER3%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        MARIADBVER: "%%MARIADBVER3%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%MARIADBVER4%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        MARIADBVER: "%%MARIADBVER4%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%MARIADBVER5%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        MARIADBVER: "%%MARIADBVER5%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
