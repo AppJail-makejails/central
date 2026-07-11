@@ -1,0 +1,39 @@
+build:
+  variants:
+    - tag: %%BASE1%%-%%POSTGRESVER1%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        POSTGRESVER: "%%POSTGRESVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%POSTGRESVER2%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        POSTGRESVER: "%%POSTGRESVER2%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%POSTGRESVER3%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        POSTGRESVER: "%%POSTGRESVER3%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%POSTGRESVER4%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        POSTGRESVER: "%%POSTGRESVER4%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%POSTGRESVER5%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        POSTGRESVER: "%%POSTGRESVER5%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
