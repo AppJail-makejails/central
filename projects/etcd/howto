@@ -1,0 +1,108 @@
+### Running a single node etcd
+
+Use the host IP address when configuring etcd:
+
+```console
+$ export NODE1=192.168.0.139
+```
+
+Create a directory to store etcd data:
+
+```console
+$ export DATA_DIR="/var/appjail-volumes/etcd/data"
+$ mkdir -p "${DATA_DIR}"
+```
+
+Profit!
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o alias \
+    -o ip4_inherit \
+    ghcr.io/appjail-makejails/etcd:%%BASE1%%-%%ETCDVER3%% node1 \
+    --data-dir=/data --name node 1 \
+    --initial-advertise-peer-urls http://${NODE1}:2380 --listen-peer-urls http://${NODE1}:2380 \
+    --advertise-client-urls http://${NODE1}:2379 --listen-client-urls http://${NODE1}:2379 \
+    --initial-cluster node1=http://${NODE1}:2380
+```
+
+List the cluster member:
+
+```console
+$ etcdctl --endpoints=http://${NODE1}:2379 member list
+```
+
+### Running a 3 node etcd cluster
+
+```sh
+#!/bin/sh
+
+set -e
+
+REGISTRY=ghcr.io/appjail-makejails/etcd
+
+ETCD_VERSION=%%BASE1%%-%%ETCDVER3%%
+TOKEN=my-etcd-token
+CLUSTER_STATE=new
+EXT_IF=lan0
+NAME_1=etcd-node-0
+NAME_2=etcd-node-1
+NAME_3=etcd-node-2
+HOST_1=192.168.0.140
+HOST_2=192.168.0.141
+HOST_3=192.168.0.142
+CIDR=24
+CLUSTER=${NAME_1}=http://${HOST_1}:2380,${NAME_2}=http://${HOST_2}:2380,${NAME_3}=http://${HOST_3}:2380
+DATA_DIR=/var/appjail-volumes/etcd/data
+
+mkdir -p "${DATA_DIR}"
+
+# For node 1
+THIS_NAME=${NAME_1}
+THIS_IP=${HOST_1}
+appjail oci run -Pd \
+  -o overwrite=force \
+  -o alias="${EXT_IF}" \
+  -o ip4="${THIS_IP}/${CIDR}" \
+  ${REGISTRY}:${ETCD_VERSION} ${THIS_NAME} \
+  --data-dir=/data --name ${THIS_NAME} \
+  --initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://0.0.0.0:2380 \
+  --advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://0.0.0.0:2379 \
+  --initial-cluster ${CLUSTER} \
+  --initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}
+
+# For node 2
+THIS_NAME=${NAME_2}
+THIS_IP=${HOST_2}
+appjail oci run -Pd \
+  -o overwrite=force \
+  -o alias="${EXT_IF}" \
+  -o ip4="${THIS_IP}/${CIDR}" \
+  ${REGISTRY}:${ETCD_VERSION} ${THIS_NAME} \
+  --data-dir=/data --name ${THIS_NAME} \
+  --initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://0.0.0.0:2380 \
+  --advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://0.0.0.0:2379 \
+  --initial-cluster ${CLUSTER} \
+  --initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}
+
+# For node 3
+THIS_NAME=${NAME_3}
+THIS_IP=${HOST_3}
+appjail oci run -Pd \
+  -o overwrite=force \
+  -o alias="${EXT_IF}" \
+  -o ip4="${THIS_IP}/${CIDR}" \
+  ${REGISTRY}:${ETCD_VERSION} ${THIS_NAME} \
+  --data-dir=/data --name ${THIS_NAME} \
+  --initial-advertise-peer-urls http://${THIS_IP}:2380 --listen-peer-urls http://0.0.0.0:2380 \
+  --advertise-client-urls http://${THIS_IP}:2379 --listen-client-urls http://0.0.0.0:2379 \
+  --initial-cluster ${CLUSTER} \
+  --initial-cluster-state ${CLUSTER_STATE} --initial-cluster-token ${TOKEN}
+```
+
+Profit!
+
+```console
+$ appjail oci exec etcd-node-0 etcdctl put foo bar
+```
