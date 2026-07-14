@@ -21,7 +21,7 @@ $ appjail oci run -Pd \
     -o alias \
     -o ip4_inherit \
     ghcr.io/appjail-makejails/etcd:%%BASE1%%-%%ETCDVER3%% node1 \
-    --data-dir=/data --name node 1 \
+    --data-dir=/data --name node1 \
     --initial-advertise-peer-urls http://${NODE1}:2380 --listen-peer-urls http://${NODE1}:2380 \
     --advertise-client-urls http://${NODE1}:2379 --listen-client-urls http://${NODE1}:2379 \
     --initial-cluster node1=http://${NODE1}:2380
