@@ -1,0 +1,70 @@
+### Standalone
+
+```console
+$ mkdir -p upload
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="$PWD/upload /app/upload" \
+    -o fstab="$PWD/config.toml app/config.toml nullfs ro" \
+    -e PUID=15000 \
+    -e PGID=15000 \
+    ghcr.io/appjail-makejails/rustypaste rustypaste
+```
+
+**Note**: The previous example assumes that you have a [config.toml](config.toml) file in the current directory.
+
+Now you can run [rpaste](https://www.freshports.org/www/rustypaste-cli) to upload some code.
+
+```console
+$ rpaste -s http://rustypaste:8000 main.c
+http://rustypaste:8000/creepy-nell.c
+$ curl http://rustypaste:8000/creepy-nell.c
+#include <stdio.h>
+#include <stdlib.h>
+
+int
+main(void)
+{
+    printf("Hello!\n");
+    return EXIT_SUCCESS;
+}
+```
+
+### Deploy using `appjail-director`
+
+**appjail-director.yml**:
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  rustypaste:
+    makejail: gh+AppJail-makejails/rustypaste
+    options:
+      - container: 'boot args:--pull'
+    volumes:
+      - upload: /app/upload
+      - config: app/config.toml
+    oci:
+      environment:
+        - PUID: 15000
+        - PGID: 15000
+
+volumes:
+  upload:
+    device: /var/appjail-volumes/rustypaste/upload
+  config:
+    device: /path/to/your/config.toml
+    type: nullfs
+    options: ro
+```
+
+**.env**:
+
+```dotenv
+DIRECTOR_PROJECT=rustypaste
+```

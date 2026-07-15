@@ -1,0 +1,33 @@
+**rustypaste** is a self-hosted and minimal file upload/pastebin service written in Rust.
+
+**Features**:
+
+- File upload & URL shortening & upload from URL
+  - supports basic HTTP authentication
+  - random file names (optional)
+    - pet name (e.g. `capital-mosquito.txt`)
+    - alphanumeric string (e.g. `yB84D2Dv.txt`)
+    - random suffix (e.g. `file.MRV5as.tar.gz`)
+  - supports expiring links
+    - auto-expiration of files (optional)
+    - auto-deletion of expired files (optional)
+  - supports one shot links/URLs (can only be viewed once)
+  - guesses MIME types
+    - supports overriding and blacklisting
+    - supports forcing to download via `?download=true`
+  - no duplicate uploads (optional)
+  - listing/deleting files
+  - custom landing page
+- Single binary
+  - [binary releases](https://github.com/orhun/rustypaste/releases)
+- Simple configuration
+  - supports hot reloading
+- Easy to deploy
+  - [appjail images](https://github.com/AppJail-makejails/rustypaste)
+  - [docker images](https://hub.docker.com/r/orhunp/rustypaste)
+- No database
+  - filesystem is used
+- Self-hosted
+  - *centralization is bad!*
+- Written in Rust
+  - *blazingly fast!*
