@@ -1,0 +1,42 @@
+### Standalone
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -e PUID=15000 \
+    -e PGID=15000 \
+    -e FLATNOTES_AUTH_TYPE=none \
+    ghcr.io/appjail-makejails/flatnotes flatnotes
+```
+
+### Deploy using `appjail-director`
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  flatnotes:
+    makejail: gh+AppJail-makejails/flatnotes
+    options:
+      - container: 'boot args:--pull'
+    volumes:
+      - data: /var/db/flatnotes
+    oci:
+      environment:
+        - PUID: 1000
+        - PGID: 1000
+        - FLATNOTES_AUTH_TYPE: "password"
+        - FLATNOTES_USERNAME: "user"
+        - FLATNOTES_PASSWORD: "changeMe!"
+        - FLATNOTES_SECRET_KEY: "aLongRandomSeriesOfCharacters"
+
+volumes:
+  data:
+    device: /var/appjail-volumes/flatnotes/data
+```
+
+See the [Environment Variables](https://github.com/dullage/flatnotes/wiki/Environment-Variables) article in the wiki for a full list of configuration options.
