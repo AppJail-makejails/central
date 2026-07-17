@@ -1,0 +1,80 @@
+This image is being shipped with a trivial [sample configuration](haproxy.cfg) and for any real life use it should be configured according to the [extensive documentation](https://docs.haproxy.org/) and [examples](https://github.com/haproxy/haproxy/tree/master/examples). We will now show how to override shipped haproxy.cfg with one of your own.
+
+### Create a `Containerfile`
+
+```dockerfile
+FROM ghcr.io/appjail-makejails/haproxy:%%BASE1%%-%%HAPROXYVER6%%
+COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+```
+
+### Build the container
+
+```console
+$ buildah build --network=host -t my-haproxy .
+```
+
+### Test the configuration file
+
+```console
+$ appjail oci run \
+    -o overwrite=force \
+    -o ephemeral \
+    localhost/my-haproxy test-haproxy-config \
+    haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg && 
+  appjail stop test-haproxy-config
+```
+
+### Run the container
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    localhost/my-haproxy my-running-haproxy
+```
+
+If you want external hosts to be able to access your HAProxy, expose the port by specifying the `-o expose` option; for example, `-o expose="8080:80"` will expose port `8080` from the host to port `80` in the container.
+
+### Use volume for configuration persistency
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/path/to/etc/haproxy /usr/local/etc/haproxy <pseudofs> ro" \
+    ghcr.io/appjail-makejails/haproxy my-running-haproxy
+```
+
+Note that your host's `/path/to/etc/haproxy` folder should be populated with a file named `haproxy.cfg` if you are using `nullfs`, but since in this case we are using `<pseudofs>` this is optional and the `haproxy.cfg` will be copied from the container to the host in case it doesn't exists.
+
+### Reloading config
+
+To be able to reload HAProxy configuration, you can send `SIGUSR2` to the container:
+
+```console
+$ appjail oci kill -s USR2 my-running-haproxy
+```
+
+### Enable Data Plane API
+
+There are equivalent images suffixed with `-api` that include Data Plane API already installed along with a [configuration file](dataplaneapi.yaml) (which works out of the box but can be modified if desired). Unlike images without the `-api` suffix, HAProxy is run using the `rc(8)` script included in the package, and Data Plane API runs in foreground.
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/path/to/etc/haproxy /usr/local/etc/haproxy <pseudofs>" \
+    ghcr.io/appjail-makejails/haproxy:%%BASE1%%-%%HAPROXYVER6%%-api my-running-haproxy
+```
+
+Unlike "standard" HAProxy images, the volume must be mounted in read-write mode (which is the default), since Data Plane API needs to write to all of those files.
+
+```console
+$ curl -X GET --user admin:mypassword http://my-running-haproxy:5555/v3/services/haproxy/configuration/version
+1
+```
+
+More information and examples in the [official documentation](https://www.haproxy.com/documentation/haproxy-data-plane-api/installation/install-on-haproxy/#run-the-api-in-docker) of Data Plane API.

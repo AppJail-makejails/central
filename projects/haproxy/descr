@@ -1,0 +1,15 @@
+HAProxy is the fastest and most widely used open-source load balancer and application delivery controller. Written in C, it has a reputation for efficient use of both processor and memory. It can proxy at either layer 4 (TCP) or layer 7 (HTTP) and has additional features for inspecting, routing and modifying HTTP messages.
+
+It comes bundled with a web UI, called the HAProxy Stats page, that you can use to monitor error rates, the volume of traffic and latency. Features can be toggled on by updating a single configuration file, which provides a syntax for defining routing rules, rate limiting, access controls, and more.
+
+Other features include:
+
+* SSL/TLS termination
+* Gzip compression
+* Health checking
+* HTTP/2
+* gRPC support
+* Lua scripting
+* DNS service discovery
+* Automatic retries of failed connections
+* Verbose logging

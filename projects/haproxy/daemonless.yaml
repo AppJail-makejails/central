@@ -1,0 +1,102 @@
+build:
+  variants:
+    - tag: %%BASE1%%-%%HAPROXYVER1%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER2%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER2%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER3%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER3%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER4%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER4%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER5%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER5%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER6%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER6%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-devel
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "-devel"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER1%%-api
+      containerfile: Containerfile.api
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER2%%-api
+      containerfile: Containerfile.api
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER2%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER3%%-api
+      containerfile: Containerfile.api
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER3%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER4%%-api
+      containerfile: Containerfile.api
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER4%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER5%%-api
+      containerfile: Containerfile.api
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER5%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%HAPROXYVER6%%-api
+      containerfile: Containerfile.api
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "%%HAPROXYVER6%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-devel-api
+      containerfile: Containerfile.api
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        HAPROXYVER: "-devel"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
