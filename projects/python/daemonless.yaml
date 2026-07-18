@@ -2,8 +2,6 @@ build:
   variants:
     - tag: %%BASE1%%
       containerfile: Containerfile
-      aliases: ["latest"]
-      default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         NO_PKGCLEAN: "1"
@@ -80,6 +78,8 @@ build:
       cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-%%PYVER11%%
       containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         PYVER: "%%PYVER11%%"
