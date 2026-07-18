@@ -1,0 +1,59 @@
+### Basic usage (no cache or additional config)
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    ghcr.io/appjail-makejails/ntfy ntfy \
+    serve
+```
+
+### With persistent cache (configured as command line arguments)
+
+```console
+$ mkdir -p /var/appjail-volumes/ntfy/cache
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/ntfy/cache /var/cache/ntfy" \
+    ghcr.io/appjail-makejails/ntfy ntfy \
+    serve --cache-file /var/cache/ntfy/cache.db
+```
+
+### Using `appjail-director` with non-root user and healthchecks enabled
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  ntfy:
+    name: ntfy
+    makejail: gh+AppJail-makejails/ntfy
+    options:
+      - container: 'boot args:--pull'
+      - healthcheck: '"health_cmd:jail:fetch -qo - http://localhost:8080/v1/health | grep -Eo \"\\\"healthy\\\"\\\\s*:\\\\s*true\" || exit 1" interval:60 timeout:10 start_period:40'
+    scripts:
+      - type: local
+        text: service appjail-health onerestart
+    volumes:
+      - cache: /var/cache/ntfy
+      - config: /usr/local/etc/ntfy
+    oci:
+      environment:
+        - PUID: 15000
+        - PGID: 15000
+        - TZ: America/Caracas
+      arguments: ["serve"]
+
+volumes:
+  cache:
+    device: /var/appjail-volumes/ntfy/cache
+  config:
+    device: /var/appjail-volumes/ntfy/config
+```
+
+**Note**: Remember to set `appjail_health_enable=YES` in your `rc.conf(5)` file so that the healthcheckers start when the system boots.
