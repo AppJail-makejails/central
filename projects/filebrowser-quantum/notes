@@ -1,0 +1,1 @@
+1. `/usr/local/etc/filebrowser-quantum.yaml` is the configuration file used by this image, but keep in mind that the image will attempt to change the owner and group of this file if it has write permission.

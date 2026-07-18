@@ -1,0 +1,11 @@
+```console
+$ mkdir -p /var/appjail-volumes/filebrowser-quantum/db
+$ mkdir -p /var/appjail-volumes/filebrowser-quantum/www
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/filebrowser-quantum/db /var/db/filebrowser-quantum" \
+    -o fstab="/var/appjail-volumes/filebrowser-quantum/www /usr/local/www/filebrowser-quantum" \
+    ghcr.io/appjail-makejails/filebrowser-quantum filebrowser-quantum
+```
