@@ -1,0 +1,47 @@
+### Standalone
+
+```console
+$ mkdir -p \
+    /var/appjail-volumes/srv \
+    /var/appjail-volumes/database \
+    /var/appjail-volumes/config
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/srv /srv" \
+    -o fstab="/var/appjail-volumes/database /database" \
+    -o fstab="/var/appjail-volumes/config /config" \
+    -o expose="80:8080" \
+    ghcr.io/appjail-makejails/filebrowser filebrowser
+```
+
+### Deploy using `appjail-director`
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  filebrowser:
+    makejail: gh+AppJail-makejails/filebrowser
+    options:
+      - container: 'boot args:--pull'
+    volumes:
+      - srv: /srv
+      - database: /database
+      - config: /config
+    oci:
+      environment:
+        - PUID: 15000
+        - PGID: 15000
+
+volumes:
+  srv:
+    device: /var/appjail-volumes/filebrowser/srv
+  database:
+    device: /var/appjail-volumes/filebrowser/database
+  config:
+    device: /var/appjail-volumes/filebrowser/config
+```
