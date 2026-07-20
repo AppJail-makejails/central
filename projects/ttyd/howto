@@ -1,0 +1,7 @@
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    ghcr.io/appjail-makejails/ttyd ttyd
+```
