@@ -1,0 +1,22 @@
+```console
+$ mkdir -p /var/appjail-volumes/hcks/data
+$ appjail oci run -Pd \
+    -o fstab="/var/appjail-volumes/hcks/data /data" \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -e DEBUG=False \
+    -e ALLOWED_HOSTS=healthchecks \
+    -e SITE_ROOT=http://healthchecks \
+    -e SITE_NAME=healthchecks \
+    -e APPRISE_ENABLED=True \
+    -e DEFAULT_FROM_EMAIL=hcks@example.org \
+    -e SECRET_KEY=mysecretkey \
+    -e EMAIL_HOST=example.org \
+    -e EMAIL_HOST_PASSWORD=123 \
+    -e EMAIL_HOST_USER=hcks \
+    -e EMAIL_PORT=1025 \
+    -e EMAIL_USE_TLS=False \
+    -e EMAIL_USE_VERIFICATION=False \
+    ghcr.io/appjail-makejails/healthchecks healthchecks
+```
