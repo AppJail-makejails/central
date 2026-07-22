@@ -1,0 +1,10 @@
+```console
+$ appjail oci run \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o ephemeral \
+    ghcr.io/appjail-makejails/tahoe-lafs tahoe-lafs \
+    --help &&
+  appjail stop tahoe-lafs
+```
