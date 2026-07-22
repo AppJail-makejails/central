@@ -1,0 +1,22 @@
+```console
+$ mkdir -p /var/appjail-volumes/shiori
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/shiori/data /var/db/shiori" \
+    -o expose=8080 \
+    ghcr.io/appjail-makejails/shiori shiori
+```
+
+Once Shiori is up and running, you can access its web interface at `http://shiori:8080` or `http://your-host-ip:8080` (from external hosts).
+
+Another way to access your bookmarks is through the CLI:
+
+```console
+$ appjail oci exec shiori shiori print
+WARN[2026-07-22T01:14:30-04:00] SHIORI_HTTP_SECRET_KEY is not set, using random value. This means that all sessions will be invalidated on server restart.
+1. https://example.org
+   > https://example.org
+
+```
