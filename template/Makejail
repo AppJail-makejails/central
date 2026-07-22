@@ -1,0 +1,5 @@
+ARG %%NAME%%_from=ghcr.io/appjail-makejails/%%NAME%%
+ARG %%NAME%%_tag=latest
+
+OPTION overwrite=force
+OPTION from=${%%NAME%%_from}:${%%NAME%%_tag}

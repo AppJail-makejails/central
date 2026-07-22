@@ -88,8 +88,10 @@ main()
 
     mkdir -p -- "${wrksrc}/.github/workflows" || exit $?
     cp -a -- "${BASEDIR}/../template/workflow.yaml" "${wrksrc}/.github/workflows/build.yaml" || exit $?
-
     sed -i '' -Ee "s#%%NAME%%#${escape_project}#g" "${wrksrc}/.github/workflows/build.yaml" || exit $?
+
+    cp -a -- "${BASEDIR}/../template/Makejail" "${wrksrc}/Makejail" || exit $?
+    sed -i '' -Ee "s#%%NAME%%#${escape_project}#g" "${wrksrc}/Makejail" || exit $?
 
     mkdir -p -- "${wrksrc}/.daemonless" || exit $?
     printf "%s\n" "${param_daemonless}" > "${wrksrc}/.daemonless/config.yaml" || exit $?
