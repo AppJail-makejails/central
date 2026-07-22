@@ -1,0 +1,58 @@
+### Standalone
+
+Great for testing the application, but not recommended for production deployments. Check out the `appjail-director` example below for a production deployment.
+
+```console
+$ mkdir -p /var/appjail-volumes/homebox/data
+$ some_random_string=$(openssl rand -base64 48)
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -e HBOX_AUTH_API_KEY_PEPPER="${some_random_string}" \
+    -o fstab="/var/appjail-volumes/homebox/data /data" \
+    ghcr.io/appjail-makejails/homebox:latest homebox
+```
+
+### Deploy using `appjail-director`
+
+**appjail-director.yml**:
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  homebox:
+    name: homebox
+    makejail: gh+AppJail-makejails/homebox
+    options:
+      - container: 'boot args:--pull'
+      - expose: '3100:7745'
+    volumes:
+      - data: /data
+    oci:
+      environment:
+        - HBOX_LOG_LEVEL: info
+        - HBOX_LOG_FORMAT: text
+        - HBOX_WEB_MAX_UPLOAD_SIZE: 10
+        - HBOX_OPTIONS_ALLOW_ANALYTICS: false
+        - HBOX_AUTH_API_KEY_PEPPER: !ENV '${AUTH_API_KEY_PEPPER}'
+        - PUID: 15000
+        - PGID: 15000
+        - TZ: America/Caracas
+
+volumes:
+  data:
+    device: /var/appjail-volumes/homebox/data
+```
+
+**.env**:
+
+```dotenv
+DIRECTOR_PROJECT=homebox
+AUTH_API_KEY_PEPPER=some_random_string
+```
+
+While in the same directory as the `appjail-director.yml` file, run `appjail-director up` to start the container. Then navigate to `http://your-host-ip:3100` (from external hosts) or `http://homebox:7745` (from the same host) to access the HomeBox Web interface.
