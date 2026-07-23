@@ -1,0 +1,268 @@
+This image requires a running PostgreSQL server.
+
+### Start a PostgreSQL server
+
+```console
+$ mkdir -p /var/appjail-volumes/odoo/db
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    -o container="args:--pull" \
+    -o fstab="/var/appjail-volumes/odoo/db /var/db/postgres" \
+    -e POSTGRES_USER=odoo \
+    -e POSTGRES_PASSWORD=odoo \
+    -e POSTGRES_DB=postgres \
+    ghcr.io/appjail-makejails/postgres odoo-db
+```
+
+**template.conf**:
+
+```
+exec.start: "/bin/sh /etc/rc"
+exec.stop: "/bin/sh /etc/rc.shutdown jail"
+mount.devfs
+persist
+sysvmsg: new
+sysvsem: new
+sysvshm: new
+```
+
+### Start an Odoo instance
+
+```console
+$ mkdir -p /var/appjail-volumes/odoo/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/odoo/data /data" \
+    -o expose=8069 \
+    -e HOST=odoo-db \
+    ghcr.io/appjail-makejails/odoo odoo
+...
+[00:00:39] [ info  ] [odoo] Detached: pid:60415, log:jails/odoo/container/2026-07-23.log
+$ appjail jail list -j odoo name network_ip4
+NAME  NETWORK_IP4
+odoo  10.0.0.9
+```
+
+Then you can hit `http://10.0.0.9:8069` (or `http://odoo:8069` if you've configured [DNS in AppJail](https://appjail.readthedocs.io/en/latest/networking/DNS/)) or `http://host-ip:8069` in your browser (and from an external host).
+
+### Stop and restart an Odoo instance
+
+```
+$ appjail stop odoo
+$ appjail start odoo
+$ # Or with just a single command:
+$ appjail restart odoo
+```
+
+### Run Odoo with a custom configuration
+
+The default configuration file for the server (located at `/usr/local/etc/odoo/odoo.conf`) can be overriden at startup using volumes. Suppose you have a custom configuration at `/path/to/config/odoo.conf`, then
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/odoo/data /data" \
+    -o fstab="/path/to/config/odoo.conf usr/local/etc/odoo/odoo.conf nullfs ro" \
+    -o expose=8069 \
+    -e HOST=odoo-db \
+    ghcr.io/appjail-makejails/odoo odoo
+```
+
+Please use [this configuration template](odoo.conf) to write your custom configuration as we already set some arguments for running Odoo inside a OCI container.
+
+You can also directly specify Odoo arguments inline. Those arguments must be given after the keyword -- in the command-line, as follows
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/odoo/data /data" \
+    -o expose=8069 \
+    -e HOST=odoo-db \
+    ghcr.io/appjail-makejails/odoo odoo \
+    -- --db-filter=odoo_db_.*
+```
+
+### Mount custom addons
+
+You can mount your own Odoo addons within the Odoo container, at `/mnt/extra-addons`
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/odoo/data /data" \
+    -o fstab="/path/to/addons /mnt/extra-addons" \
+    -o expose=8069 \
+    -e HOST=odoo-db \
+    ghcr.io/appjail-makejails/odoo odoo
+```
+
+**Note**: Altough there is no official Odoo Enterprise Docker image, the Enterprise modules can be mounted by using the above mentioned method.
+
+### AppJail Director examples
+
+The simplest `appjail-director.yml` file would be:
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+  - container: 'boot args:--pull'
+
+services:
+  web:
+    name: odoo
+    makejail: gh+AppJail-makejails/odoo
+    volumes:
+      - data: /data
+    oci:
+      environment:
+        - HOST: odoo-db
+    options:
+      - expose: 8069
+  db:
+    name: odoo-db
+    priority: 98
+    makejail: gh+AppJail-makejails/postgres
+    volumes:
+      - db: /var/db/postgres
+    options:
+      - template: !ENV '${PWD}/template.conf'
+    scripts:
+      - type: local
+        text: service appjail-dns restart
+    oci:
+      environment:
+        - POSTGRES_DB: postgres
+        - POSTGRES_PASSWORD: odoo
+        - POSTGRES_USER: odoo
+
+volumes:
+  data:
+    device: /var/appjail-volumes/odoo/data
+  db:
+    device: /var/appjail-volumes/odoo/db
+```
+
+**.env**:
+
+```dotenv
+DIRECTOR_PROJECT=erp
+```
+
+If the default postgres credentials does not suit you, tweak the environment variables:
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+  - container: 'boot args:--pull'
+
+services:
+  web:
+    name: odoo
+    makejail: gh+AppJail-makejails/odoo
+    volumes:
+      - data: /data
+    oci:
+      environment:
+        - HOST: odoo-db
+        - USER: odoo
+        - PASSWORD: myodoo
+    options:
+      - expose: 8069
+  db:
+    name: odoo-db
+    priority: 98
+    makejail: gh+AppJail-makejails/postgres
+    volumes:
+      - db: /var/db/postgres
+    options:
+      - template: !ENV '${PWD}/template.conf'
+    scripts:
+      - type: local
+        text: service appjail-dns restart
+    oci:
+      environment:
+        - POSTGRES_DB: postgres
+        - POSTGRES_PASSWORD: myodoo
+        - POSTGRES_USER: odoo
+
+volumes:
+  data:
+    device: /var/appjail-volumes/odoo/data
+  db:
+    device: /var/appjail-volumes/odoo/db
+```
+
+Here's a last example showing you how to
+
+* mount custom addons located in `./addons`
+* use a custom configuration file located in `.config/odoo.conf`
+* use volumes for the Odoo and postgres data dir
+* use a file that contains the postgreql password shared by both services
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+  - container: 'boot args:--pull'
+  - volume: odoo-secrets
+
+services:
+  web:
+    name: odoo
+    makejail: gh+AppJail-makejails/odoo
+    volumes:
+      - data: /data
+      - secrets: odoo-secrets
+    oci:
+      environment:
+        - HOST: odoo-db
+        - PASSWORD_FILE: /volumes/odoo-secrets/postgresql_password
+    options:
+      - expose: 8069
+  db:
+    name: odoo-db
+    priority: 98
+    makejail: gh+AppJail-makejails/postgres
+    volumes:
+      - db: /var/db/postgres
+      - secrets: odoo-secrets
+    options:
+      - template: !ENV '${PWD}/template.conf'
+    scripts:
+      - type: local
+        text: service appjail-dns restart
+    oci:
+      environment:
+        - POSTGRES_DB: postgres
+        - POSTGRES_PASSWORD_FILE: /volumes/odoo-secrets/postgresql_password
+        - POSTGRES_USER: odoo
+
+volumes:
+  data:
+    device: /var/appjail-volumes/odoo/data
+  db:
+    device: /var/appjail-volumes/odoo/db
+  secrets:
+    device: /var/appjail-volumes/odoo/secrets
+    type: '<volumefs>'
+    options: ro
+```
+
+To start your Odoo instance, go in the directory of the `appjail-director.yml` file you created from the previous examples and type:
+
+```console
+appjail-director up
+```
