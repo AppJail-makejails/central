@@ -90,8 +90,10 @@ main()
     cp -a -- "${BASEDIR}/../template/workflow.yaml" "${wrksrc}/.github/workflows/build.yaml" || exit $?
     sed -i '' -Ee "s#%%NAME%%#${escape_project}#g" "${wrksrc}/.github/workflows/build.yaml" || exit $?
 
-    cp -a -- "${BASEDIR}/../template/Makejail" "${wrksrc}/Makejail" || exit $?
-    sed -i '' -Ee "s#%%NAME%%#${escape_project}#g" "${wrksrc}/Makejail" || exit $?
+    if [ ! -f "${projectdir}/empty_makejail" ]; then
+        cp -a -- "${BASEDIR}/../template/Makejail" "${wrksrc}/Makejail" || exit $?
+        sed -i '' -Ee "s#%%NAME%%#${param_alias}#g" "${wrksrc}/Makejail" || exit $?
+    fi
 
     mkdir -p -- "${wrksrc}/.daemonless" || exit $?
     printf "%s\n" "${param_daemonless}" > "${wrksrc}/.daemonless/config.yaml" || exit $?

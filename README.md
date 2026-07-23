@@ -23,7 +23,8 @@ A substitution list is used to replace values. `templates/sub/` serves as a cent
 * `arguments/{stage}/{name}/` (optional): Arguments used at each different stages. Name in lowercase.
 * `environment/{stage}/{name}/` (optional): Environment variables used at each different stages. Name in lowercase.
 * `oci/environment/{name}/` (optional): Environment variables used by the OCI image.
-* `oc/empty_env` (optional): An empty file that, when present, don't add default environment variables.
+* `oci/empty_env` (optional): An empty file that, when present, don't add default environment variables.
+* `empty_makejail` (optional): An empty file that, when present, don't add a default `Makejail` file.
 * `volumes/{name}/` (optional): Volumes used by this Makejail.
 * `notes` (optional): Notes and extra information about this Makejail. Use markdown.
 * `sub/{name}` (optional): Substitution list. Name in uppercase.
