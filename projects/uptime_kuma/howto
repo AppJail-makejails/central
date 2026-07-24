@@ -1,0 +1,10 @@
+```console
+$ mkdir -p /var/appjail-volumes/uptime-kuma/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o expose=3001 \
+    -o fstab="/var/appjail-volumes/uptime-kuma/data /var/db/uptime-kuma" \
+    ghcr.io/appjail-makejails/uptime_kuma uptime-kuma
+```
