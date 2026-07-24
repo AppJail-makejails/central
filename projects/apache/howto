@@ -18,7 +18,7 @@ $ appjail oci run -Pd \
 [00:00:25] [ info  ] [my-running-app] Detached: pid:20568, log:jails/my-running-app/container/2026-07-03.log
 $ appjail jail list -j my-running-app
 STATUS  NAME            ALT_NAME  TYPE   VERSION       PORTS  NETWORK_IP4
-UP      my-running-app  -         thick  15.1-RELEASE  -      10.0.0.9
+UP      my-running-app  -         thick  %%BASE1%%-RELEASE  -      10.0.0.9
 ```
 
 Visit http://10.0.0.9:8080 and you will see It works!
