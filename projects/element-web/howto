@@ -1,0 +1,22 @@
+You can use [Virtual Networks](https://appjail.readthedocs.io/en/latest/networking/virtual-networks/intro/#default-virtual-network-recommended), but Element Web requires a secure context, so you'll need to configure TLS. The easiest way to deploy Element Web is to [inherit the host's network stack](https://appjail.readthedocs.io/en/latest/networking/ip-inherit/) and listen on `localhost:80`.
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o alias \
+    -o ip4_inherit \
+    -o ip6_inherit \
+    ghcr.io/appjail-makejails/element-web element-web
+```
+
+To supply your own custom `config.json`, map a volume to `/usr/local/www/element/config.json`. For example, if your custom config was located at `/path/to/element-web/config.json` then your AppJail command would be:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o alias \
+    -o ip4_inherit \
+    -o ip6_inherit \
+    -o fstab="/path/to/element-web/config.json usr/local/www/element/config.json" \
+    ghcr.io/appjail-makejails/element-web element-web
+```
