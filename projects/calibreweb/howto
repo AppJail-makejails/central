@@ -1,0 +1,64 @@
+### Application Setup
+
+WebUI can be found at `http://your-ip:8083` (from external hosts) or at `http://calibre-web:8083` (from the same host, provided you have [enabled DNS in AppJail](https://appjail.readthedocs.io/en/latest/networking/DNS/) and the jail is named `calibre-web`).
+
+On the initial setup screen, enter `/books` as your calibre library location.
+
+**Default admin login**: *Username*: `admin` *Password*: `admin123`
+
+If you lock yourself out or forget a password, you will need to specify the app.db similar to this: `appjail oci exec calibre-web cps -p /conf/app.db -s <user>:<pass>`. If you fail to specify the proper db, it will appear to succeed, but it will not work.
+
+[unrar](https://freshports.org/archivers/unrar) is included by default and needs to be set in the Calibre-Web admin page (`Basic Configuration:External Binaries`) with a path of `/usr/local/bin/unrar`.
+
+Ebook conversion is enabled by default utilising [Calibre](https://freshports.org/deskutils/calibre), this means if you don't require this feature the container isn't uneccessarily bloated but should you require it, it is easily available. To use this option, go to the Calibre-Web admin page (`Basic Configuration:External Binaries`) set the **Path to Calibre E-Book Converter** to `/usr/local/bin/ebook-convert` on versions 0.6.21 and lower. For 0.6.22 and higher, set the directory, `/usr/local/bin/` only.
+
+This image contains the [kepubify](https://freshports.org/textproc/kepubify) ebook conversion tool to convert epub to kepub. In the Calibre-Web admin page (`Basic Configuration:External Binaries`) set the **Path to Kepubify E-Book Converter** to `/usr/local/bin/kepubify`.
+
+### Standalone
+
+```console
+$ mkdir -p /var/appjail-volumes/calibre-web/conf
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/calibre-web/conf /conf" \
+    -o fstab="/path/to/your/calibre/library /books <pseudofs>" \
+    -e OAUTHLIB_RELAX_TOKEN_SCOPE=1 \ # See https://github.com/janeczku/calibre-web/issues/1472
+    -e TZ=UTC \
+    -e PUID=1000 \
+    -e PGID=1000 \
+    ghcr.io/appjail-makejails/calibreweb calibre-web
+```
+
+### Deploy using `appjail-director`
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+  - container: 'boot args:--pull'
+
+services:
+  calibre-web:
+    name: calibre-web
+    makejail: gh+AppJail-makejails/calibreweb
+    volumes:
+      - conf: /conf
+      - books: /books
+    oci:
+      environment:
+        - PUID: 1000
+        - PGID: 1000
+        - TZ: UTC
+        # see https://github.com/janeczku/calibre-web/issues/1472
+        - OAUTHLIB_RELAX_TOKEN_SCOPE: 1
+    options:
+      - expose: 8083
+
+volumes:
+  conf:
+    device: /var/appjail-volumes/calibre-web/conf
+  books:
+    device: /path/to/your/calibre/library
+```
