@@ -1,0 +1,83 @@
+### Standalone
+
+Before starting the container:
+
+* (optional) download a configuration file:
+
+  ```console
+  $ fetch -o minetest.conf https://github.com/luanti-org/luanti/blob/master/minetest.conf.example?raw=true
+  ```
+
+* create the necessary directories:
+
+  ```console
+  $ mkdir -p games mods data/.minetest/games data/.minetest/mods
+  ```
+
+* install the game you want to play in `./games/`. Follow [this guide](https://content.luanti.org/help/installing/#installing-using-the-command-line). For example, to install `voxelibre` using `git`
+
+  ```console
+  $ git clone https://git.minetest.land/VoxeLibre/VoxeLibre ./games/voxelibre/
+  ```
+
+* start the container
+
+  ```console
+  $ appjail oci run -Pd \
+      -e PUID=15000 \ # arbitrary
+      -e PGID=15000 \ # arbitrary
+      -o overwrite=force \
+      -o virtualnet=":<random> default" \
+      -o nat \
+      -o fstab="$PWD/minetest.conf usr/local/etc/minetest.conf nullfs ro" \
+      -o fstab="$PWD/data /var/db/minetest" \
+      -o fstab="$PWD/games /var/db/minetest/.minetest/games nullfs ro" \
+      -o fstab="$PWD/mods /var/db/minetest/.minetest/mods nullfs ro" \
+      -o expose="30000 proto:udp" \
+      ghcr.io/appjail-makejails/luanti luanti \
+      --config /usr/local/etc/minetest.conf --gameid voxelibre --worldname world
+  ```
+
+`./data/.minetest/` has the directory `worlds/`, where the world will be saved.
+
+### Deploy using `appjail-director`
+
+**appjail-director.yml**:
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+  - container: 'boot args:--pull' 
+
+services:
+  luanti:
+    name: luanti
+    makejail: gh+AppJail-makejails/minetest
+    volumes:
+      - config: usr/local/etc/minetest.conf
+      - data: /var/db/minetest
+      - games: /var/db/minetest/.minetest/games
+      - mods: /var/db/minetest/.minetest/mods
+    oci:
+      environment:
+        - PUID: 15000
+        - PGID: 15000
+      arguments: ["--config", "/usr/local/etc/minetest.conf", "--gameid", "voxelibre", "--worldname", "world"]
+    options:
+      - expose: '30000 proto:udp'
+
+default_volume_type: nullfs
+
+volumes:
+  config:
+    device: !ENV '${PWD}/minetest.conf'
+  data:
+    device: !ENV '${PWD}/data'
+  games:
+    device: !ENV '${PWD}/games'
+    options: ro
+  mods:
+    device: !ENV '${PWD}/mods'
+    options: ro
+```
