@@ -1,0 +1,16 @@
+```console
+$ # Server
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    ghcr.io/appjail-makejails/toxiproxy toxiproxy
+$ # Client
+$ appjail oci run \
+    -o overwrite=force \
+    -o alias \
+    -o ip4_inherit \
+    -o ephemeral \
+    ghcr.io/appjail-makejails/toxiproxy toxiproxy-cli \
+    toxiproxy-cli --host http://toxiproxy:8474 list
+```
