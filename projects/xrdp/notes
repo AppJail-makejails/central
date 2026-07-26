@@ -1,0 +1,1 @@
+1. This image drops privileges in Xrdp. See [Running the xrdp process as non root](https://github.com/neutrinolabs/xrdp/wiki/Running-the-xrdp-process-as-non-root) for more details.
