@@ -1,0 +1,42 @@
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    ghcr.io/appjail-makejails/coredns coredns \
+    -dns.port=1053
+...
+$ appjail jail list -j coredns name network_ip4
+NAME     NETWORK_IP4
+coredns  10.0.0.8
+```
+
+Once you have a `coredns` binary, you can use the `-plugins` flag to list all the compiled plugins. Without a `Corefile` (See [Configuration](https://coredns.io/manual/toc/#configuration)) CoreDNS will load the [whoami](https://coredns.io/plugins/whoami) plugin that will respond with the IP address and port of the client. So to test, we start CoreDNS to run on port 1053 and send it a query using [`dig`](https://freshports.org/dns/bind-tools):
+
+```console
+$ dig @10.0.0.8 -p 1053 a whoami.example.org
+
+; <<>> DiG 9.20.24 <<>> @10.0.0.8 -p 1053 a whoami.example.org
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 39862
+;; flags: qr aa rd; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 3
+;; WARNING: recursion requested but not available
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1232
+; COOKIE: 849c8d65a4784b81 (echoed)
+;; QUESTION SECTION:
+;whoami.example.org.		IN	A
+
+;; ADDITIONAL SECTION:
+whoami.example.org.	0	IN	A	10.0.0.1
+_udp.whoami.example.org. 0	IN	SRV	0 0 42695 .
+
+;; Query time: 0 msec
+;; SERVER: 10.0.0.8#1053(10.0.0.8) (UDP)
+;; WHEN: Mon Jul 27 20:53:46 -04 2026
+;; MSG SIZE  rcvd: 135
+
+```
