@@ -1,0 +1,76 @@
+### Standalone
+
+Pull the image and run the container:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -e "DATABASE_URL=postgres://miniflux:*password*@*dbhost*/miniflux?sslmode=disable" \
+    -e "RUN_MIGRATIONS=1" \
+    -e "CREATE_ADMIN=1" \
+    -e "ADMIN_USERNAME=*username*" \
+    -e "ADMIN_PASSWORD=*password*" \
+    ghcr.io/appjail-makejails/miniflux:latest miniflux
+```
+
+The command above will run the migrations and set up a new admin account with the chosen username and password.
+
+Once the container is started, you should be able to access the application on the exposed port, which is port 80 in this example.
+
+### Deploy using `appjail-director`
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+  - container: 'boot args:--pull'
+
+services:
+  miniflux:
+    name: miniflux
+    makejail: gh+AppJail-makejails/miniflux
+    oci:
+      environment:
+        - DATABASE_URL: postgres://miniflux:secret@10.0.0.60/miniflux?sslmode=disable
+        - RUN_MIGRATIONS: 1
+        - CREATE_ADMIN: 1
+        - ADMIN_USERNAME: admin
+        - ADMIN_PASSWORD: test123
+    options:
+      - expose: 8080
+  db:
+    name: miniflux-db
+    makejail: gh+AppJail-makejails/postgres
+    oci:
+      environment:
+        - POSTGRES_USER: miniflux
+        - POSTGRES_PASSWORD: secret
+        - POSTGRES_DB: miniflux
+    volumes:
+      - miniflux-db: /var/db/postgres
+    options:
+      - template: !ENV '${PWD}/template.conf'
+      - virtualnet: 'ajnet:<random> address:10.0.0.60 default'
+
+volumes:
+  miniflux-db:
+    device: /var/appjail-volumes/miniflux/db
+```
+
+**template.conf**:
+
+```
+exec.start: "/bin/sh /etc/rc"
+exec.stop: "/bin/sh /etc/rc.shutdown jail"
+mount.devfs
+persist
+sysvmsg: new
+sysvsem: new
+sysvshm: new
+```
+
+* `DATABASE_URL` defines the database connection parameters.
+* `RUN_MIGRATIONS=1` runs the SQL migrations automatically.
+* `CREATE_ADMIN`, `ADMIN_USERNAME`, and `ADMIN_PASSWORD` allow the creation of the first admin user. These can be removed after the first initialization.
