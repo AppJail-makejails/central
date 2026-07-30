@@ -7,13 +7,13 @@ build:
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         APACHEVER: "%%APACHEVER1%%"
-        PHPVER: "%%PHPVER1%%"
+        PHPVER: "%%PHPVER%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-fpm
       containerfile: Containerfile.fpm
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
-        PHPVER: "%%PHPVER1%%"
+        PHPVER: "%%PHPVER%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
