@@ -1,0 +1,44 @@
+Both the master and the worker may require external dependencies. You can create a new OCI image with the dependencies you need or use the `pkg` option as shown below.
+
+**Master**:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -e BUILDBOT_CONFIG_DIR=/config \
+    -e BUILDBOT_CONFIG_URL=https://github.com/buildbot/buildbot-docker-example-config/archive/master.tar.gz \
+    -e BUILDBOT_WORKER_PORT=9989 \
+    -e BUILDBOT_WEB_URL=http://buildbot-master:8010/ \
+    -e BUILDBOT_WEB_PORT=tcp:port=8010 \
+    -o pkg=git-tiny \
+    ghcr.io/appjail-makejails/buildbot buildbot-master
+```
+
+**Worker**:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -e BUILDMASTER=buildbot-master \
+    -e BUILDMASTER_PORT=9989 \
+    -e WORKERNAME=example-worker \
+    -e WORKERPASS=pass \
+    -e WORKER_ENVIRONMENT_BLACKLIST="DOCKER_BUILDBOT* BUILDBOT_ENV_* BUILDBOT_1* WORKER_ENVIRONMENT_BLACKLIST" \
+    -o pkg=git-tiny \
+    -o pkg=py%%PYVER%%-pyflakes \
+    ghcr.io/appjail-makejails/buildbot:%%BASE1%%-worker buildbot-worker
+```
+
+---
+
+You should now be able to go to http://buildbot-master:8010 and see a web page similar to:
+
+![](https://docs.buildbot.net/latest/_images/index.png)
+
+Click on “Builds” at the left to open the submenu and then [Builders](http://buildbot-master:8010/#/builders) to see that the worker you just started has connected to the master:
+
+![](https://docs.buildbot.net/latest/_images/builders.png)
