@@ -1,0 +1,16 @@
+```console
+$ mkdir -p /var/appjail-volumes/searxng/cache
+$ mkdir -p /var/appjail-volumes/searxng/config
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/searxng/cache /var/cache/searxng" \
+    -o fstab="/var/appjail-volumes/searxng/config /usr/local/etc/searxng" \
+    ghcr.io/appjail-makejails/searxng searxng
+```
+
+The following environment variables can be configured:
+
+* `$SEARXNG_*`: Controls the SearXNG configuration options, look out for environment `$SEARXNG_*` in [server:](https://docs.searxng.org/admin/settings/settings_server.html#settings-server) and [general:](https://docs.searxng.org/admin/settings/settings_general.html#settings-general).
+* `$GRANIAN_*`: Controls the [Granian server options](https://docs.searxng.org/admin/installation-granian.html#granian-configuration).
