@@ -38,7 +38,7 @@ services:
         - PGID: 1000
     options:
       - expose: '8000'
-      - container: 'boot args:--pull'
+      - container: 'args:--pull'
     volumes:
       - data: /data
       - config: /config

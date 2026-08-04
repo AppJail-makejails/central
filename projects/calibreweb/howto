@@ -37,7 +37,7 @@ $ appjail oci run -Pd \
 options:
   - virtualnet: ':<random> default'
   - nat:
-  - container: 'boot args:--pull'
+  - container: 'args:--pull'
 
 services:
   calibre-web:

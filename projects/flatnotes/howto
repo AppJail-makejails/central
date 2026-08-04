@@ -22,7 +22,7 @@ services:
   flatnotes:
     makejail: gh+AppJail-makejails/flatnotes
     options:
-      - container: 'boot args:--pull'
+      - container: 'args:--pull'
     volumes:
       - data: /var/db/flatnotes
     oci:

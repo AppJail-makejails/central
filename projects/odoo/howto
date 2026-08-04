@@ -117,7 +117,7 @@ The simplest `appjail-director.yml` file would be:
 options:
   - virtualnet: ':<random> default'
   - nat:
-  - container: 'boot args:--pull'
+  - container: 'args:--pull'
 
 services:
   web:
@@ -166,7 +166,7 @@ If the default postgres credentials does not suit you, tweak the environment var
 options:
   - virtualnet: ':<random> default'
   - nat:
-  - container: 'boot args:--pull'
+  - container: 'args:--pull'
 
 services:
   web:
@@ -216,7 +216,7 @@ Here's a last example showing you how to
 options:
   - virtualnet: ':<random> default'
   - nat:
-  - container: 'boot args:--pull'
+  - container: 'args:--pull'
   - volume: odoo-secrets
 
 services:
