@@ -1,0 +1,41 @@
+### Standalone
+
+```console
+$ mkdir -p /var/appjail-volumes/homepage/config
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/homepage/config /config" \
+    -e PUID=1000 \
+    -e PGID=1000 \
+    -e HOMEPAGE_ALLOWED_HOSTS=homepage:3000 \
+    ghcr.io/appjail-makejails/homepage homepage
+```
+
+### Deploy using `appjail-director`
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  homepage:
+    name: homepage
+    makejail: gh+AppJail-makejails/homepage
+    oci:
+      environment:
+        - HOMEPAGE_ALLOWED_HOSTS: 'homepage:3000' # required. See gethomepage.dev/installation/#homepage_allowed_hosts
+        - PUID: 1000 # optional, your user id
+        - PGID: 1000 # optional, your group id
+    options:
+      - expose: '3000:3000'
+      - container: 'args:--pull'
+    volumes:
+      - config: /config
+
+volumes:
+  config:
+    device: /var/appjail-volumes/homepage/config
+```
