@@ -5,10 +5,17 @@ $ appjail oci run -Pd \
     -o overwrite=force \
     -o virtualnet=":<random> default" \
     -o nat \
+    -o expose=8080 \
     -o fstab="/var/appjail-volumes/searxng/cache /var/cache/searxng" \
     -o fstab="/var/appjail-volumes/searxng/config /usr/local/etc/searxng" \
     ghcr.io/appjail-makejails/searxng searxng
+...
+$ appjail jail list -j searxng name network_ip4
+NAME     NETWORK_IP4
+searxng  10.0.0.8
 ```
+
+Then you can hit `http://10.0.0.8:8080` (or `http://searxng:8080` if you've configured [DNS in AppJail](https://appjail.readthedocs.io/en/latest/networking/DNS/)) or `http://host-ip:8080` in your browser (and from an external host).
 
 The following environment variables can be configured:
 
