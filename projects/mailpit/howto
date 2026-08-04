@@ -1,0 +1,62 @@
+### Standalone
+
+A basic example of running Mailpit within AppJail:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o expose=8025:8025 \
+    -o expose=1025:1025 \
+    ghcr.io/appjail-makejails/mailpit mailpit
+```
+
+You need to ensure you map the correct ports (default Web UI on 8025 and SMTP on 1025).
+
+### Setting Mailpit options
+
+View all [runtime options](https://mailpit.axllent.org/docs/configuration/runtime-options/) (flags & environment variables). Environment variables can be set using the `-e` flag when starting your container, for instance:
+
+```console
+$ mkdir -p /var/appjail-volumes/mailpit/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/mailpit/data /data" \
+    -e MP_DATABASE="/data/mailpit.db" \
+    -e MP_UI_AUTH_FILE="/data/authfile" \
+    -e TZ=America/Caracas \
+    ghcr.io/appjail-makejails/mailpit mailpit
+```
+
+### AppJail Director example
+
+The following example exposes both the web UI port (8025) and SMTP port (1025) to external hosts. If your `appjail-director.yml` is running multi-container applications and does not require (for instance) 1025 to be open to the host, then you can omit - `expose: '1025:1025'` which will then only expose it to the other containers.
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  mailpit:
+    name: mailpit
+    makejail: gh+AppJail-makejails/mailpit
+    volumes:
+      - data: /data
+    options:
+      - expose: '8025:8025'
+      - expose: '1025:1025'
+    oci:
+      environment:
+        - MP_MAX_MESSAGES: 5000
+        - MP_DATABASE: /data/mailpit.db
+        - MP_SMTP_AUTH_ACCEPT_ANY: 1
+        - MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+volumes:
+  data:
+    device: /var/appjail-volumes/mailpit/data
+```
