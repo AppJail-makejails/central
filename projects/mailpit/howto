@@ -49,6 +49,7 @@ services:
     options:
       - expose: '8025:8025'
       - expose: '1025:1025'
+      - container: 'args:--pull'
     oci:
       environment:
         - MP_MAX_MESSAGES: 5000
