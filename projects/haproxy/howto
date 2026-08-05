@@ -3,7 +3,7 @@ This image is being shipped with a trivial [sample configuration](haproxy.cfg) a
 ### Create a `Containerfile`
 
 ```dockerfile
-FROM ghcr.io/appjail-makejails/haproxy:%%BASE1%%-%%HAPROXYVER6%%
+FROM ghcr.io/appjail-makejails/haproxy:%%BASE1%%-%%HAPROXYVER5%%
 COPY haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
 ```
 
@@ -67,7 +67,7 @@ $ appjail oci run -Pd \
     -o virtualnet=":<random> default" \
     -o nat \
     -o fstab="/path/to/etc/haproxy /usr/local/etc/haproxy <pseudofs>" \
-    ghcr.io/appjail-makejails/haproxy:%%BASE1%%-%%HAPROXYVER6%%-api my-running-haproxy
+    ghcr.io/appjail-makejails/haproxy:%%BASE1%%-%%HAPROXYVER5%%-api my-running-haproxy
 ```
 
 Unlike "standard" HAProxy images, the volume must be mounted in read-write mode (which is the default), since Data Plane API needs to write to all of those files.
