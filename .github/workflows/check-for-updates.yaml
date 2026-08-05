@@ -33,6 +33,9 @@ jobs:
 
           OUTPUT=$(./check-updates.sh 2>&1)
           echo "$OUTPUT" > updates_log.txt
+
+          ls -- "${PORTSDIR}"
+          echo
           cat updates_log.txt
 
           echo "output<<EOF" >> $GITHUB_OUTPUT
