@@ -33,6 +33,7 @@ jobs:
 
           OUTPUT=$(./check-updates.sh 2>&1)
           echo "$OUTPUT" > updates_log.txt
+          cat updates_log.txt
 
           echo "output<<EOF" >> $GITHUB_OUTPUT
           echo "$OUTPUT" >> $GITHUB_OUTPUT
