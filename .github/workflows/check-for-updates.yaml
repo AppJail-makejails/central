@@ -28,9 +28,9 @@ jobs:
         run: |
           cd central
 
-          sed -i 's/find -E /find -regextype posix-extended /g' ./check-updates.sh
+          sed -i 's/find -E /find -regextype posix-extended /g' ./scripts/check-for-updates.sh
 
-          OUTPUT=$(./check-updates.sh)
+          OUTPUT=$(./scripts/check-for-updates.sh)
           echo "$OUTPUT" > updates_log.txt
           cat updates_log.txt
 
