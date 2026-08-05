@@ -26,12 +26,11 @@ jobs:
         env:
           PORTSDIR: ${{ github.workspace }}/freebsd-ports
         run: |
-          cp central/scripts/check-for-updates.sh ./check-updates.sh
-          chmod +x ./check-updates.sh
+          cd central
 
           sed -i 's/find -E /find -regextype posix-extended /g' ./check-updates.sh
 
-          OUTPUT=$(/bin/sh -x ./check-updates.sh)
+          OUTPUT=$(./check-updates.sh)
           echo "$OUTPUT" > updates_log.txt
           cat updates_log.txt
 
