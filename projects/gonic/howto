@@ -1,0 +1,60 @@
+### Standalone
+
+```console
+$ mkdir -p /var/appjail-volumes/gonic/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/gonic/data /data" \
+    -o fstab="/path/to/music /music nullfs ro" \
+    -o fstab="/path/to/podcasts /podcasts" \
+    -o fstab="/path/to/playlists /playlists" \
+    -o fstab="/path/to/cache /cache" \
+    ghcr.io/appjail-makejails/gonic gonic
+```
+
+### Deploy using `appjail-director`
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  gonic:
+    name: gonic
+    makejail: gh+AppJail-makejails/gonic
+    options:
+      - expose: '4747:8080' # for external hosts
+      - container: 'args:--pull'
+      # set the following if you've enabled jukebox
+      - mount_devfs:
+      - device: 'include $devfsrules_hide_all'
+      - device: 'include $devfsrules_unhide_basic'
+      - device: 'include $devfsrules_unhide_login'
+      - device: "path 'dsp*' unhide"
+    volumes:
+      - data: /data # gonic db etc
+      - music: /music # your music
+      - podcasts: /podcasts # your podcasts
+      - playlists: /playlists # your playlists
+      - cache: /cache # transcode / covers / etc cache dir
+    oci:
+      environment:
+        - TZ: !ENV '${TZ}'
+        # optionally, see more available env vars in the readme: https://github.com/sentriz/gonic/wiki/installation#with-docker
+
+volumes:
+  data:
+    device: /var/appjail-volumes/gonic/data
+  music:
+    device: /path/to/music
+    options: ro
+  podcasts:
+    device: /path/to/podcasts
+  playlists:
+    device: /path/to/playlists
+  cache:
+    device: /path/to/cache
+```
