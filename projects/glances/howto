@@ -1,0 +1,22 @@
+### CLI
+
+```console
+$ appjail oci run \
+    -o ephemeral \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    ghcr.io/appjail-makejails/glances glances &&
+  appjail stop glances
+```
+
+### Web-UI
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o expose=61208 \
+    ghcr.io/appjail-makejails/glances glances
+```
