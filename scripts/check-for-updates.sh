@@ -66,7 +66,7 @@ main()
     done
 
     local ports_regex
-    ports_regex=`printf "%s" "${ports}" | sed -Ee 's/[0-9]+/[0-9]+/g' | tr ' ' $'\n' | sort | uniq`
+    ports_regex=`printf "%s" "${ports}" | sed -Ee 's/[0-9]+/[0-9]+/g' | tr ' ' '\n' | sort | uniq`
 
     local regex
 
