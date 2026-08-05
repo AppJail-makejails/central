@@ -18,5 +18,5 @@ $ appjail oci run -Pd \
     -o virtualnet=":<random> default" \
     -o nat \
     -o expose=61208 \
-    ghcr.io/appjail-makejails/glances glances
+    ghcr.io/appjail-makejails/glances glances -w
 ```
