@@ -50,11 +50,18 @@ build:
       cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-%%REDISVER7%%
       containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        REDISVER: "%%REDISVER7%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%REDISVER8%%
+      containerfile: Containerfile
       aliases: ["latest"]
       default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
-        REDISVER: "%%REDISVER7%%"
+        REDISVER: "%%REDISVER8%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-devel
