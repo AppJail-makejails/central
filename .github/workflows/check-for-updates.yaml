@@ -31,11 +31,8 @@ jobs:
 
           sed -i 's/find -E /find -regextype posix-extended /g' ./check-updates.sh
 
-          OUTPUT=$(./check-updates.sh 2>&1)
+          OUTPUT=$(/bin/sh -x ./check-updates.sh)
           echo "$OUTPUT" > updates_log.txt
-
-          ls -- "${PORTSDIR}"
-          echo
           cat updates_log.txt
 
           echo "output<<EOF" >> $GITHUB_OUTPUT
