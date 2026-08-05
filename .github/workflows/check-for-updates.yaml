@@ -31,7 +31,7 @@ jobs:
           sed -i 's/find -E /find /g' scripts/check-for-updates.sh
           sed -i 's/-regex /-regextype posix-extended -regex /g' scripts/check-for-updates.sh
 
-          OUTPUT=$(/bin/sh -x ./scripts/check-for-updates.sh)
+          OUTPUT=$(./scripts/check-for-updates.sh)
           echo "$OUTPUT" > updates_log.txt
           cat updates_log.txt
 
