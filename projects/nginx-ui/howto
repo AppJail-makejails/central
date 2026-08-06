@@ -1,0 +1,57 @@
+### Standalone
+
+```console
+$ mkdir -p /var/appjail-volumes/nginx-ui/data
+$ mkdir -p /var/appjail-volumes/nginx-ui/sites-available
+$ mkdir -p /var/appjail-volumes/nginx-ui/sites-enabled
+$ mkdir -p /var/appjail-volumes/nginx-ui/streams-available
+$ mkdir -p /var/appjail-volumes/nginx-ui/streams-enabled
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o expose="8080:80" \
+    -o fstab="/var/appjail-volumes/nginx-ui/data /var/db/nginx-ui <pseudofs>" \
+    -o fstab="/var/appjail-volumes/nginx-ui/sites-available /usr/local/etc/nginx/sites-available" \
+    -o fstab="/var/appjail-volumes/nginx-ui/sites-enabled /usr/local/etc/nginx/sites-enabled" \
+    -o fstab="/var/appjail-volumes/nginx-ui/streams-available /usr/local/etc/nginx/streams-available" \
+    -o fstab="/var/appjail-volumes/nginx-ui/streams-enabled /usr/local/etc/nginx/streams-enabled" \
+    ghcr.io/appjail-makejails/nginx-ui nginx-ui
+```
+
+### Deploy using `appjail-director`
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  nginx-ui:
+    name: nginx-ui
+    makejail: gh+AppJail-makejails/nginx-ui
+    options:
+      - expose: '8080:80'
+      - container: 'args:--pull'
+    oci:
+      environment:
+        - TZ: !ENV '${TZ}'
+    volumes:
+      - data: /var/db/nginx-ui
+      - sites-available: /usr/local/etc/nginx/sites-available
+      - sites-enabled: /usr/local/etc/nginx/sites-enabled
+      - streams-available: /usr/local/etc/nginx/streams-available
+      - streams-enabled: /usr/local/etc/nginx/streams-enabled
+
+volumes:
+  data:
+    device: /var/appjail-volumes/nginx-ui/data
+  sites-available:
+    device: /var/appjail-volumes/nginx-ui/sites-available
+  sites-enabled:
+    device: /var/appjail-volumes/nginx-ui/sites-enabled
+  streams-available:
+    device: /var/appjail-volumes/nginx-ui/streams-available
+  streams-enabled:
+    device: /var/appjail-volumes/nginx-ui/streams-enabled
+```
