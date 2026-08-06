@@ -92,7 +92,10 @@ main()
 
     if [ ! -f "${projectdir}/empty_makejail" ]; then
         cp -a -- "${BASEDIR}/../template/Makejail" "${wrksrc}/Makejail" || exit $?
-        sed -i '' -Ee "s#%%NAME%%#${param_alias}#g" "${wrksrc}/Makejail" || exit $?
+        sed -E -i '' \
+            -e "s#%%ALIAS%%#${param_alias}#g" \
+            -e "s#%%PROJECT%%#${project}#g" \
+            "${wrksrc}/Makejail" || exit $?
     fi
 
     mkdir -p -- "${wrksrc}/.daemonless" || exit $?

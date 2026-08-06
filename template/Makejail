@@ -1,6 +1,6 @@
-ARG %%NAME%%_from=ghcr.io/appjail-makejails/%%NAME%%
-ARG %%NAME%%_tag=latest
+ARG %%ALIAS%%_from=ghcr.io/appjail-makejails/%%PROJECT%%
+ARG %%ALIAS%%_tag=latest
 
 OPTION container=boot
 OPTION overwrite=force
-OPTION from=${%%NAME%%_from}:${%%NAME%%_tag}
+OPTION from=${%%ALIAS%%_from}:${%%ALIAS%%_tag}
