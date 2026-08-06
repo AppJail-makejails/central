@@ -15,10 +15,13 @@ build:
         FLAVOUR: '-devel'
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
-    - tag: %%BASE1%%-full
-      containerfile: Containerfile
-      args:
-        FREEBSD_RELEASE: "%%BASE1%%"
-        FLAVOUR: '-full'
-        NO_PKGCLEAN: "1"
-      cache_dirs: ["%%PKGCACHE0%%"]
+    #
+    # IGNORE: required at least GSSAPI_HEIMDAL or GSSAPI_MIT to be defined. Please do 'make config' again
+    #
+    #- tag: %%BASE1%%-full
+    #  containerfile: Containerfile
+    #  args:
+    #    FREEBSD_RELEASE: "%%BASE1%%"
+    #    FLAVOUR: '-full'
+    #    NO_PKGCLEAN: "1"
+    #  cache_dirs: ["%%PKGCACHE0%%"]
