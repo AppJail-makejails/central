@@ -7,7 +7,6 @@ build:
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         X11_FLAVOR: xlibre
-        PYVER: "%%PYVER%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-xorg
@@ -15,6 +14,5 @@ build:
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         X11_FLAVOR: xorg
-        PYVER: "%%PYVER%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
