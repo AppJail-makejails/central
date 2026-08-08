@@ -1,0 +1,84 @@
+### Deploy Jellyfin using Virtual Networks
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    -o expose="8096" \
+    -o expose="7359 proto:udp" \
+    -o fstab="/path/to/config /var/db/jellyfin" \
+    -o fstab="/path/to/cache /var/cache/jellyfin" \
+    -o fstab="/path/to/media /media" \
+    ghcr.io/appjail-makejails/jellyfin jellyfin
+```
+
+**template.conf**:
+
+```
+exec.start: "/bin/sh /etc/rc"
+exec.stop: "/bin/sh /etc/rc.shutdown jail"
+mount.devfs
+persist
+allow.mlock
+```
+### Deploy Jellyfin using Host Networking
+
+The example above uses [Virtual Networks](https://appjail.readthedocs.io/en/latest/networking/virtual-networks/intro/). Using [host networking](https://appjail.readthedocs.io/en/latest/networking/ip-inherit/) (`-o alias -o ip4_inherit -o ip6_inherit`) is optional but required in order to use DLNA.
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o alias \
+    -o ip4_inherit \
+    -o ip6_inherit \
+    -o template=template.conf \
+    -o expose="8096" \
+    -o expose="7359 proto:udp" \
+    -o fstab="/path/to/config /var/db/jellyfin" \
+    -o fstab="/path/to/cache /var/cache/jellyfin" \
+    -o fstab="/path/to/media /media" \
+    ghcr.io/appjail-makejails/jellyfin jellyfin
+```
+
+### Deploy using `appjail-director` (+hardware acceleration)
+
+```yaml
+options:
+  - alias:
+  - ip4_inherit:
+  - ip6_inherit:
+
+services:
+  jellyfin:
+    name: jellyfin
+    makejail: gh+AppJail-makejails/jellyfin
+    options:
+      - template: !ENV '${PWD}/template.conf'
+      - mount_devfs:
+      - device: "path dri unhide"
+      - device: "path 'dri/*' unhide"
+      - device: "path drm unhide"
+      - device: "path 'drm/*' unhide"
+      - device: "path pci unhide"
+      - device: "path 'nvidia*' unhide"
+    volumes:
+      - config: /var/db/jellyfin
+      - cache: /var/cache/jellyfin
+      - media: /media
+    oci:
+      # Optional - alternative address used for autodiscovery
+      environment:
+        - JELLYFIN_PublishedServerUrl: http://example.com
+
+volumes:
+  config:
+    device: /var/appjail-volumes/jellyfin/config
+  cache:
+    device: /var/appjail-volumes/jellyfin/cache
+  media:
+    device: /path/to/media
+```
+
+Since the previous example uses the host networking, you can access Jellyfin via `http://localhost:8096` or your host's IP address.

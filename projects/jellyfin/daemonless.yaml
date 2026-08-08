@@ -1,0 +1,11 @@
+build:
+  variants:
+    - tag: %%BASE1%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        JELLYFIN_FFMPEG_VERSION: "%%JELLYFIN_FFMPEG_VERSION%%"
+        FREEBSD_RELEASE: "%%BASE1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
