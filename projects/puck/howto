@@ -3,7 +3,9 @@
     -f gh+AppJail-makejails/puck \
     -o container="args:--pull" \
     -- \
-    --puck_file /path/to/your/suspicious/file.pdf
+    --puck_file /path/to/your/suspicious/file.pdf \
+    --puid $(id -u) \
+    --pgid $(id -g)
 ...
 # xdg-open file.trusted.pdf
 ...
