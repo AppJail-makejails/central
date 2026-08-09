@@ -1,0 +1,1 @@
+Allow a user to use any hostname that match this regex. Read [this](https://github.com/cmur2/dyndnsd?tab=readme-ov-file#matching-with-a-regular-expression) for details.

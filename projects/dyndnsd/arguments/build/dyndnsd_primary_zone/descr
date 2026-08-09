@@ -1,0 +1,1 @@
+The primary zone controlled by the static zone file. It is also concatenated with the label used by `dyndnsd_dyn_domain` and `dyndnsd_ns_domain`.

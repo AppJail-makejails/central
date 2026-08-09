@@ -1,0 +1,1 @@
+Interval that should elapse before a failed refresh should be retried.

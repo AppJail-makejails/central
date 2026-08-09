@@ -1,0 +1,1 @@
+Space-separated list of hosts that the user will control. The user must be specified in `DYNDNSD_USERS` or this environment variable will be silently ignored. Each host must match `^[a-zA-Z0-9]([-a-zA-Z0-9]{0,61}[a-zA-Z0-9])?$` or it will be silently ignored. Each host is concatenated with the values specified in the arguments `dyndnsd_dyn_domain` and `dyndnsd_primary_zone`.

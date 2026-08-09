@@ -1,0 +1,2 @@
+1. As you have seen, most of the parameters in [Arguments](#arguments) are implemented to configure NSD conveniently, but not all parameters are implemented, only some. See [files/nsd.conf](files/nsd.conf) for more details.
+2. This Makejail includes [gh+AppJail-makejails/user-mapping](https://github.com/AppJail-makejails/user-mapping), so `puid` and `pgid` are available as arguments.

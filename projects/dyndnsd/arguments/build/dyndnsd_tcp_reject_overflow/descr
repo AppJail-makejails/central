@@ -1,0 +1,1 @@
+If set to yes, TCP connections made beyond the maximum set by dyndnsd_tcp_count will be dropped immediately (accepted and closed).

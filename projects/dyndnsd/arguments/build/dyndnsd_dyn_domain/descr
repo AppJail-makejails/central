@@ -1,0 +1,1 @@
+The zone (which is concatenated by `dyndnsd_primary_zone`) that dyndnsd will use and control and where the subdomains are located.
