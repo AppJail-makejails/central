@@ -1,0 +1,63 @@
+### Basic usage
+
+Running Prometheus on AppJail is as simple as `appjail oci run -Pd -o overwrite=force -o virtualnet=":<random> default" -o nat -o expose=9090 ghcr.io/appjail-makejails/prometheus prometheus`. This starts Prometheus with a sample configuration and exposes it on port 9090.
+
+### Setting command line parameters
+
+The OCI image is started with a number of default command line parameters, which can be found in the [Containerfile](Containerfile).
+
+If you want to add extra command line parameters to the `appjail oci run` command, you will need to re-add these yourself as they will be overwritten.
+
+### Volumes & nullfs-mount
+
+To provide your own configuration, nullfs-mount your `prometheus.yml` from the host by running:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/path/to/prometheus.yml usr/local/etc/prometheus.yml nullfs ro" \
+    ghcr.io/appjail-makejails/prometheus prometheus
+```
+
+### Save your Prometheus data
+
+Prometheus data is stored in `/prometheus` dir inside the container, so the data is cleared every time the container is recreated. To save your data, you need to set up persistent storage (or nullfs mounts) for your container.
+
+Run Prometheus container with persistent storage:
+
+```console
+$ mkdir -p /var/appjail-volumes/prometheus/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/path/to/prometheus.yml usr/local/etc/prometheus.yml nullfs ro" \
+    -o fstab="/var/appjail-volumes/prometheus/data /prometheus" \
+    ghcr.io/appjail-makejails/prometheus prometheus
+```
+
+### Custom image
+
+To avoid managing a file on the host and nullfs-mount it, the configuration can be baked into the image. This works well if the configuration itself is rather static and the same across all environments.
+
+For this, create a new directory with a Prometheus configuration and a `Containerfile` like this:
+
+```dockerfile
+FROM ghcr.io/appjail-makejails/prometheus
+ADD prometheus.yml /usr/local/etc
+```
+
+Now build and run it:
+
+```console
+$ buildah build --network=host -t my-prometheus .
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    localhost/my-prometheus prometheus
+```
+
+A more advanced option is to render the configuration dynamically on start with some tooling or even have a daemon update it periodically.

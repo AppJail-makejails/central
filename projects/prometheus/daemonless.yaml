@@ -1,0 +1,25 @@
+build:
+  variants:
+    - tag: %%BASE1%%-%%PROMETHEUSVER3%%
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        PROMETHEUSVER: "%%PROMETHEUSVER3%%"
+        FREEBSD_RELEASE: "%%BASE1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%PROMETHEUSVER2%%
+      containerfile: Containerfile
+      args:
+        PROMETHEUSVER: "%%PROMETHEUSVER2%%"
+        FREEBSD_RELEASE: "%%BASE1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%PROMETHEUSVER1%%
+      containerfile: Containerfile
+      args:
+        PROMETHEUSVER: "%%PROMETHEUSVER1%%"
+        FREEBSD_RELEASE: "%%BASE1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
