@@ -1,0 +1,1 @@
+Grafana is an open-source analytics and visualization web application. It connects to time series databases and other data sources, allowing users to build dashboards that display metrics, logs, and traces. Grafana supports data sources including Prometheus, AWS CloudWatch, Graphite, InfluxDB, Elasticsearch, PostgreSQL, and MySQL.
