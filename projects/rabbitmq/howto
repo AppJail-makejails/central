@@ -155,7 +155,7 @@ You can then go to `http://some-rabbit:15672` (from the same host) or `http://ho
 
 #### Enabling Plugins
 
-Creating a Dockerfile will have them enabled at runtime. To see the full list of plugins present on the image `rabbitmq-plugins list`.
+Creating a Containerfile will have them enabled at runtime. To see the full list of plugins present on the image `rabbitmq-plugins list`.
 
 ```dockerfile
 FROM ghcr.io/appjail-makejails/rabbitmq:%%BASE1%%-management
