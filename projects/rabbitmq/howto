@@ -1,0 +1,177 @@
+### Running the daemon
+
+One of the important things to note about RabbitMQ is that it stores data based on what it calls the "Node Name", which defaults to the hostname. If you want to use a hostname other than the one provided by AppJail, you can configure a custom one in an `appjail-template(5)` file.
+
+```console
+$ cp /usr/local/share/appjail/files/default_template.conf template.conf
+$ chmod +w template.conf
+$ appjail-config set -t template.conf host.hostname=my-rabbit
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    ghcr.io/appjail-makejails/rabbitmq some-rabbit
+...
+[00:00:33] [ info  ] [some-rabbit] Detached: pid:76709, log:jails/some-rabbit/container/2026-08-11.log
+```
+
+This will start a RabbitMQ container listening on the default port of 5672. If you give that a minute, then do `appjail logs read jails/some-rabbit/container/2026-08-11.log`, you'll see in the output a block similar to:
+
+```
+  Starting broker...2026-08-11 18:50:14.834947-04:00 [info] <0.208.0>
+2026-08-11 18:50:14.834947-04:00 [info] <0.208.0>  node           : rabbit@my-rabbit
+2026-08-11 18:50:14.834947-04:00 [info] <0.208.0>  home dir       : /var/db/rabbitmq
+2026-08-11 18:50:14.834947-04:00 [info] <0.208.0>  config file(s) : /usr/local/etc/rabbitmq/conf.d/10-defaults.conf
+2026-08-11 18:50:14.834947-04:00 [info] <0.208.0>                 : /usr/local/etc/rabbitmq/conf.d/20-management_agent.disable_metrics_colle
+ctor.conf
+2026-08-11 18:50:14.834947-04:00 [info] <0.208.0>  log(s)         : <stdout>
+2026-08-11 18:50:14.834947-04:00 [info] <0.208.0>  data dir       : /var/db/rabbitmq/mnesia/rabbit@my-rabbit
+```
+
+Note the `data dir` there, especially that it has my "Node Name" appended to the end for the file storage. This image makes all of `/var/db/rabbitmq` a volume by default.
+
+#### Environment variables
+
+**WARNING**: As of RabbitMQ 3.9, all of the OCI-specific variables listed below are deprecated and no longer used. Please use a configuration file instead; visit [rabbitmq.com/configure](https://www.rabbitmq.com/configure.html) to learn more about the configuration file.
+
+```
+# Unavailable in 3.9 and up
+RABBITMQ_DEFAULT_PASS_FILE
+RABBITMQ_DEFAULT_USER_FILE
+RABBITMQ_MANAGEMENT_SSL_CACERTFILE
+RABBITMQ_MANAGEMENT_SSL_CERTFILE
+RABBITMQ_MANAGEMENT_SSL_DEPTH
+RABBITMQ_MANAGEMENT_SSL_FAIL_IF_NO_PEER_CERT
+RABBITMQ_MANAGEMENT_SSL_KEYFILE
+RABBITMQ_MANAGEMENT_SSL_VERIFY
+RABBITMQ_SSL_CACERTFILE
+RABBITMQ_SSL_CERTFILE
+RABBITMQ_SSL_DEPTH
+RABBITMQ_SSL_FAIL_IF_NO_PEER_CERT
+RABBITMQ_SSL_KEYFILE
+RABBITMQ_SSL_VERIFY
+RABBITMQ_VM_MEMORY_HIGH_WATERMARK
+```
+
+#### Setting default user and password
+
+If you wish to change the default username and password of `guest` / `guest`, you can do so with the `RABBITMQ_DEFAULT_USER` and `RABBITMQ_DEFAULT_PASS` environmental variables. These variables were available previously in the docker-specific entrypoint shell script but are now available in RabbitMQ directly.
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    -o expose="15672" \
+    -o expose="5672" \
+    -e RABBITMQ_DEFAULT_USER=user \
+    -e RABBITMQ_DEFAULT_PASS=password \
+    ghcr.io/appjail-makejails/rabbitmq:%%BASE1%%-management some-rabbit
+```
+
+You can then go to `http://some-rabbit:15672` (from the same host) or `http://host-ip:15672` (from external hosts) in a browser and use `user`/`password` to gain access to the [management UI](https://www.rabbitmq.com/docs/management).
+
+#### Setting default vhost
+
+If you wish to change the default vhost, you can do so with the `RABBITMQ_DEFAULT_VHOST` environmental variables:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    -e RABBITMQ_DEFAULT_VHOST=my_vhost \
+    ghcr.io/appjail-makejails/rabbitmq:%%BASE1%%-management some-rabbit
+```
+
+#### Memory Limits
+
+In AppJail, you can set [limits](https://appjail.readthedocs.io/en/latest/limits/), and in this case, one for `vmemoryuse`.
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    -o limits="vmemoryuse:deny=4g" \
+    ghcr.io/appjail-makejails/rabbitmq some-rabbit
+```
+
+However, unlike Linux, where RabbitMQ could calculate `vm_memory_high_watermark.absolute` (described under [Memory Alarms](https://www.rabbitmq.com/memory.html)) using cgroups, there is no equivalent in FreeBSD, so this parameter must be set explicitly.
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    -o limits="vmemoryuse:deny=5g" \
+    -o fstab="$PWD/30-high_watermark.conf usr/local/etc/rabbitmq/conf.d/30-high_watermark.conf" \
+    ghcr.io/appjail-makejails/rabbitmq some-rabbit
+$ appjail oci exec -u noroot some-rabbit rabbitmqctl status | grep -Ee "^Memory high watermark setting: "
+Memory high watermark setting: 4.295 gb, computed to: 4.295 gb
+```
+
+**30-high_watermark.conf**:
+
+```
+vm_memory_high_watermark.absolute = 4Gi
+```
+
+#### Erlang Cookie
+
+See the [RabbitMQ "Clustering Guide"](https://www.rabbitmq.com/clustering.html#erlang-cookie) for more information about cookies and why they're necessary. For setting a consistent cookie (especially useful for clustering but also for remote/cross-container administration via `rabbitmqctl`), provide a cookie file (default location of `/var/db/rabbitmq/.erlang.cookie`).
+
+#### Management Plugin
+
+There is a second set of tags provided with the [management plugin](https://www.rabbitmq.com/management.html) installed and enabled by default, which is available on the standard management port of 15672, with the default username and password of `guest` / `guest`:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    ghcr.io/appjail-makejails/rabbitmq:%%BASE1%%-management some-rabbit
+```
+
+You can access it by visiting `http://some-rabbit:15672` in a browser or, if you need access outside the host, on port 8080:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o template=template.conf \
+    -o expose="8080:15672" \
+    ghcr.io/appjail-makejails/rabbitmq:%%BASE1%%-management some-rabbit
+```
+
+You can then go to `http://some-rabbit:15672` (from the same host) or `http://host-ip:8080` (from external hosts) in a browser.
+
+#### Enabling Plugins
+
+Creating a Dockerfile will have them enabled at runtime. To see the full list of plugins present on the image `rabbitmq-plugins list`.
+
+```dockerfile
+FROM ghcr.io/appjail-makejails/rabbitmq:%%BASE1%%-management
+RUN rabbitmq-plugins enable --offline rabbitmq_mqtt rabbitmq_federation_management rabbitmq_stomp
+```
+
+You can also mount a file at `/usr/local/etc/rabbitmq/enabled_plugins` with contents as an erlang list of atoms ending with a period.
+
+Example `enabled_plugins`:
+
+```
+[rabbitmq_federation_management,rabbitmq_management,rabbitmq_mqtt,rabbitmq_stomp].
+```
+
+#### Additional Configuration
+
+If configuration is required, it is recommended to supply an appropriate `/usr/local/etc/rabbitmq/rabbitmq.conf` file (see [the "Configuration File(s)" section of the RabbitMQ documentation for more details](https://www.rabbitmq.com/configure.html#configuration-files)), for example via nullfs-mount, or a short `Containerfile` with a `COPY` instruction.
+
+Alternatively, it is possible to use the `RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS` environment variable, whose syntax is described [in section 7.8 ("Configuring an Application") of the Erlang OTP Design Principles User's Guide](http://erlang.org/doc/design_principles/applications.html#id81887) (the appropriate value for `-ApplName` is `-rabbit`), this method requires a slightly different reproduction of its equivalent entry in `rabbitmq.conf`. For example, configuring [`channel_max`](https://www.rabbitmq.com/configure.html#config-items) would look something like `-e RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-rabbit channel_max 4007"`. Where the space between the variable `channel_max` and its value `4007` correctly becomes a comma when translated in the environment.
