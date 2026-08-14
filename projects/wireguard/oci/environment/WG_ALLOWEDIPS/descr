@@ -1,0 +1,1 @@
+See `AllowedIPs` in `wg(8)`. If you do not set this environment variable, the network address will be used.

@@ -1,0 +1,1 @@
+WireGuard is a communication protocol and free and open-source software that implements encrypted virtual private networks (VPNs), and was designed with the goals of ease of use, high speed performance, and low attack surface. It aims to be smaller and better performing than IPsec and OpenVPN, two common tunneling protocols. The WireGuard protocol passes traffic over UDP.

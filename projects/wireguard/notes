@@ -1,0 +1,2 @@
+1. This Makejail is based on an old project I worked on called `wireguard-xcaler`.
+2. If you change a parameter such as endpoint or network address after recreating the jail, note that the old peers still use the old endpoint and network address, so you will have to change them manually. I do not recommend you to change those parameters after recreating the jail, keep them the same. If you want to use different parameters after recreating the jail, just don't use the same volume.
