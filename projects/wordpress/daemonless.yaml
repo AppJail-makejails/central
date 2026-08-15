@@ -6,7 +6,7 @@ build:
       default: true
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
-        APACHEVER: "%%APACHEVER1%%"
+        APACHEVER: "%%APACHEVER%%"
         PHPVER: "%%PHPVER%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
