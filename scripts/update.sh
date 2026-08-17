@@ -201,8 +201,20 @@ main()
             local envdir_root
             envdir_root=`dirname -- "${envdir}"` || exit $?
 
-            if [ -f "${projectdir}/oci/empty_env" ] && \
-                    [ "${envdir_root}" = "${BASEDIR}/../template/oci/environment" ]; then
+            local env
+            env="${envdir##*/}"
+
+            local ignoredir
+
+            if [ -f "${projectdir}/oci/environment/${env}/inherit" ]; then
+                ignoredir="${projectdir}/oci/environment"
+            elif [ -f "${projectdir}/oci/empty_env" ]; then
+                ignoredir="${BASEDIR}/../template/oci/environment"
+            else
+                ignoredir=
+            fi
+
+            if [ -n "${ignoredir}" ] && [ "${envdir_root}" = "${ignoredir}" ]; then
                 continue
             fi
 
@@ -212,9 +224,6 @@ main()
 
                 display_env_header=false
             fi
-
-            local env
-            env="${envdir##*/}"
 
             local env_type="optional"
             if [ -f "${envdir}/mandatory" ]; then
