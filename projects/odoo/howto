@@ -210,14 +210,14 @@ Here's a last example showing you how to
 * mount custom addons located in `./addons`
 * use a custom configuration file located in `.config/odoo.conf`
 * use volumes for the Odoo and postgres data dir
-* use a file that contains the postgreql password shared by both services
+* use [secrets](https://appjail.readthedocs.io/en/latest/secrets/) that contains the postgreql password shared by both services
 
 ```yaml
 options:
   - virtualnet: ':<random> default'
   - nat:
   - container: 'args:--pull'
-  - volume: odoo-secrets
+  - secret: odoo
 
 services:
   web:
@@ -225,13 +225,12 @@ services:
     makejail: gh+AppJail-makejails/odoo
     volumes:
       - data: /data
-      - secrets: odoo-secrets
       - config: /usr/local/etc/odoo
       - addons: /mnt/extra-addons
     oci:
       environment:
         - HOST: odoo-db
-        - PASSWORD_FILE: /volumes/odoo-secrets/postgresql_password
+        - PASSWORD_FILE: /secrets/odoo/postgresql_password
     options:
       - expose: 8069
   db:
@@ -240,7 +239,6 @@ services:
     makejail: gh+AppJail-makejails/postgres
     volumes:
       - db: /var/db/postgres
-      - secrets: odoo-secrets
     options:
       - template: !ENV '${PWD}/template.conf'
     scripts:
@@ -249,7 +247,7 @@ services:
     oci:
       environment:
         - POSTGRES_DB: postgres
-        - POSTGRES_PASSWORD_FILE: /volumes/odoo-secrets/postgresql_password
+        - POSTGRES_PASSWORD_FILE: /secrets/odoo/postgresql_password
         - POSTGRES_USER: odoo
 
 volumes:
@@ -261,10 +259,6 @@ volumes:
     device: !ENV '${PWD}/config'
   addons:
     device: !ENV '${PWD}/addons'
-  secrets:
-    device: /var/appjail-volumes/odoo/secrets
-    type: '<volumefs>'
-    options: ro
 ```
 
 To start your Odoo instance, go in the directory of the `appjail-director.yml` file you created from the previous examples and type:
