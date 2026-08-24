@@ -1,0 +1,2 @@
+1. The ideas present in the Docker image of Document Server are taken into account for users who are familiar with it.
+2. Unlike upstream that implement a Dockerfile for the three editions, community, enterprise and developer, the first one is the one that makes sense since the port is based on that edition.
