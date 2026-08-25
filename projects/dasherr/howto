@@ -1,0 +1,8 @@
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/path/to/your/config.json /usr/local/www/html/settings.json" \
+    ghcr.io/appjail-makejails/dasherr dasherr
+```
