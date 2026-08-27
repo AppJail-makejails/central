@@ -1,0 +1,30 @@
+1. Configure Sopel if you haven't already.
+
+   ```console
+   $ mkdir -p etc log db
+   $ SUFFIX=$(openssl rand -hex 6)
+   $ appjail oci run -i \
+       -o ephemeral \
+       -o overwrite=force \
+       -o virtualnet=":<random> default" \
+       -o nat \
+       -o fstab="$PWD/etc /usr/local/etc/sopel" \
+       -o fstab="$PWD/log /var/log/sopel" \
+       -o fstab="$PWD/db /var/db/sopel" \
+       ghcr.io/appjail-makejails/sopel sopel-${SUFFIX} \
+       sopel configure && \
+     appjail stop sopel-${SUFFIX}
+   ```
+
+2. Profit!
+
+   ```console
+   $ appjail oci run -Pd \
+       -o overwrite=force \
+       -o virtualnet=":<random> default" \
+       -o nat \
+       -o fstab="$PWD/etc /usr/local/etc/sopel" \
+       -o fstab="$PWD/log /var/log/sopel" \
+       -o fstab="$PWD/db /var/db/sopel" \
+       ghcr.io/appjail-makejails/sopel sopel
+   ```
