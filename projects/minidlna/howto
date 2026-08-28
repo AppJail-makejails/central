@@ -1,0 +1,17 @@
+To configure your MiniDLNA you must keep the following in mind: each parameter has a value, it must be prefixed with `MINIDLNA_` and the rest must be in uppercase and must only contain letters and underscores.
+
+```console
+$ mkdir -p db log
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o alias \
+    -o ip4_inherit \
+    -o ip6_inherit \
+    -e MINIDLNA_NOTIFY_INTERVAL="60" \
+    -e MINIDLNA_MEDIA_DIR="V,/media/Videos" \
+    -o fstab="/path/to/your/media /media" \
+    -o fstab="$PWD/db /var/db/minidlna" \
+    -o fstab="$PWD/log /var/log/minidlna" \
+    ghcr.io/appjail-makejails/minidlna minidlna
+```
+
