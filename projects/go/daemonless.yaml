@@ -22,10 +22,3 @@ build:
         GOVER: "%%GOVER2%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
-    - tag: %%BASE1%%-%%GOVER3%%
-      containerfile: Containerfile
-      args:
-        FREEBSD_RELEASE: "%%BASE1%%"
-        GOVER: "%%GOVER3%%"
-        NO_PKGCLEAN: "1"
-      cache_dirs: ["%%PKGCACHE0%%"]
