@@ -30,6 +30,7 @@ A substitution list is used to replace values. `templates/sub/` serves as a cent
 * `notes` (optional): Notes and extra information about this Makejail. Use markdown.
 * `sub/{name}` (optional): Substitution list. Name in uppercase.
 * `daemonless.yaml` (optional): dbuild configuration to build OCI images.
+* `is_appjail` (optional): Mark as an AppJail. [](template/workflows/release.yaml) is added to create an AppJail for each tag, powered by [`x11appjail(1)`](https://github.com/DtxdF/x11appjail).
 
 #### Keywords: {oci/environment,{arguments,environment}/{stage}}/{name}/
 

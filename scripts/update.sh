@@ -87,10 +87,17 @@ main()
     escape_project=`printf "%s" "${project}" | sed -Ee 's/#/\\\\#/g'` || exit $?
 
     mkdir -p -- "${wrksrc}/.github/workflows" || exit $?
-    cp -a -- "${BASEDIR}/../template/workflow.yaml" "${wrksrc}/.github/workflows/build.yaml" || exit $?
+    cp -a -- "${BASEDIR}/../template/workflows/build.yaml" "${wrksrc}/.github/workflows/build.yaml" || exit $?
     sed -i '' -Ee "s#%%NAME%%#${escape_project}#g" "${wrksrc}/.github/workflows/build.yaml" || exit $?
 
-    if [ ! -f "${projectdir}/empty_makejail" ]; then
+    if [ -f "${projectdir}/is_appjail" ]; then
+        cp -a -- "${BASEDIR}/../template/workflows/release.yaml" "${wrksrc}/.github/workflows/release.yaml" || exit $?
+        local pinned_base
+        pinned_base=`head -1 -- "${BASEDIR}/../template/sub/BASE1"` || exit $?
+        sed -i '' -Ee "s#%%BASE%%#${pinned_base}#g" "${wrksrc}/.github/workflows/release.yaml" || exit $?
+    fi
+
+    if [ ! -f "${projectdir}/empty_makejail" ] && [ ! -f "${projectdir}/is_appjail" ]; then
         cp -a -- "${BASEDIR}/../template/Makejail" "${wrksrc}/Makejail" || exit $?
         sed -E -i '' \
             -e "s#%%ALIAS%%#${param_alias}#g" \
@@ -118,7 +125,11 @@ main()
             printf "\n"
         fi
 
-        printf "## How to use this Makejail\n"
+        if [ -f "${projectdir}/is_appjail" ]; then
+            printf "## How to use this AppJail\n"
+        else
+            printf "## How to use this Makejail\n"
+        fi
         printf "\n"
         printf "%s\n" "${param_howto}"
         printf "\n"
@@ -141,7 +152,9 @@ main()
                 echo "### Arguments (stage: ${stage})"
                 echo
             else
-                _write_stage_build
+                if [ ! -f "${projectdir}/is_appjail" ]; then
+                    _write_stage_build
+                fi
             fi
 
             local stagedir
@@ -183,8 +196,10 @@ main()
         done
 
         if ! ${stage_build}; then
-            _write_stage_build
-            echo
+            if [ ! -f "${projectdir}/is_appjail" ]; then
+                _write_stage_build
+                echo
+            fi
         fi
 
         local display_env_header=true
@@ -208,7 +223,7 @@ main()
 
             if [ -f "${projectdir}/oci/environment/${env}/inherit" ]; then
                 ignoredir="${projectdir}/oci/environment"
-            elif [ -f "${projectdir}/oci/empty_env" ]; then
+            elif [ -f "${projectdir}/oci/empty_env" ] || [ -f "${projectdir}/is_appjail" ]; then
                 ignoredir="${BASEDIR}/../template/oci/environment"
             else
                 ignoredir=
@@ -347,6 +362,61 @@ main()
             fi
 
             echo "| ${volume} | ${volume_owner} | ${volume_group} | ${volume_perm} | ${volume_type} | ${volume_mountpoint} |"
+        done
+
+        local attr_type
+        for attr_type in user system; do
+            local display_attr_header=true
+            local attr
+            for attr in "${projectdir}/attr/${attr_type}"/*; do
+                if [ "${attr}" = "${projectdir}/attr/${attr_type}/*" ]; then
+                    break
+                fi
+
+                if ${display_attr_header}; then
+                    echo
+                    if [ "${attr_type}" = "user" ]; then
+                        echo "### User Attributes"
+                    elif [ "${attr_type}" = "system" ]; then
+                        echo "### System Attributes"
+                    else
+                        echo "Unknown attribute type: ${attr_type}" >&2
+                        exit 1
+                    fi
+                    echo
+
+                    display_attr_header=false
+                fi
+
+                attr="${attr##*/}"
+
+                local attr_name
+                if [ -f "${attr}/name" ]; then
+                    attr_name=`head -1 -- "${attr}/name"` || exit $?
+                elif [ -f "${BASEDIR}/../template/attr/${attr_type}/${attr}/name" ]; then
+                    attr_name=`head -1 -- "${BASEDIR}/../template/attr/${attr_type}/${attr}/name"` || exit $?
+                else
+                    attr_name="${attr}"
+                fi
+
+                echo "##### \`${attr_name}\`"
+                echo
+
+                local attrdir
+                attrdir="${projectdir}/attr/${attr_type}/${attr}"
+
+                local attr_descr
+                if [ -f "${attrdir}/descr" ]; then
+                    attr_descr="${attrdir}/descr"
+                elif [ -f "${BASEDIR}/../template/attr/${attr_type}/${attr}/descr" ]; then
+                    attr_descr="${BASEDIR}/../template/attr/${attr_type}/${attr}/descr"
+                else
+                    echo "missing: ${attrdir}/descr" >&2
+                    exit 1
+                fi
+
+                cat -- "${attr_descr}" || exit $?
+            done
         done
 
         echo

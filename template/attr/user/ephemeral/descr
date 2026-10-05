@@ -1,0 +1,3 @@
+Mark the jail as ephemeral. See `ephemeral` option in `appjail-quick(1)` for details.
+
+Although the jail may be destroyed, its data is preserved in the user directory (see `${X11APPJAIL_USERDIR}` in `x11appjail-spec(5)`).

@@ -1,0 +1,17 @@
+build:
+  variants:
+    - tag: %%BASE1%%-x11
+      containerfile: Containerfile
+      aliases: ["latest"]
+      default: true
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        IS_X11: "1"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-nox11
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]

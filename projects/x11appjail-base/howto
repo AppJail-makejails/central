@@ -1,0 +1,6 @@
+```sh
+appjail makejail \
+    -j x11appjail \
+    -f gh+AppJail-makejails/x11appjail-base \
+    -o container="args:--pull"
+```
