@@ -388,6 +388,8 @@ main()
                         exit 1
                     fi
                     echo
+                    echo "| Name | Description |"
+                    echo "| --- | --- |"
 
                     display_attr_header=false
                 fi
@@ -403,9 +405,6 @@ main()
                     attr_name="${attr}"
                 fi
 
-                echo "##### \`${attr_name}\`"
-                echo
-
                 local attrdir
                 attrdir="${projectdir}/attr/${attr_type}/${attr}"
 
@@ -419,7 +418,22 @@ main()
                     exit 1
                 fi
 
-                cat -- "${attr_descr}" || exit $?
+                local lines
+                lines=`cat -- "${attr_descr}" | wc -l` || exit $?
+
+                echo -n "| \`${attr}\` | "
+                if [ ${lines} -gt 1 ]; then
+                    local line
+                    while IFS= read -r line; do
+                        printf "%s<br>" "${line}"
+                    done < "${attr_descr}" || exit $?
+                else
+                    local line
+                    line=`cat -- "${attr_descr}"` || exit $?
+
+                    printf "%s" "${line}"
+                fi
+                echo "|"
             done
         done
 
