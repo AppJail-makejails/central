@@ -1,0 +1,1 @@
+Read-only mounts the fonts system inside the jail, configure Fontconfig, and rebuild the font cache.
