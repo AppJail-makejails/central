@@ -1,0 +1,10 @@
+A space-separated list of "permissions" granted to a specific user.
+
+The implemented "permissions" are presented below:
+
+* `enable_3d`
+* `webcam`
+* `usb`
+* `sound`
+
+For a description of any of them, consult `${X11APPJAIL_APPNAME}:${X11APPJAIL_PROFILE}.allow.<permission>` in the "[User Attributes](#user-attributes)" section.

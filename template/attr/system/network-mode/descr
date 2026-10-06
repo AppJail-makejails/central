@@ -1,0 +1,7 @@
+Network mode. Default is `none`.
+
+There are three modes:
+
+1. `virtualnet`: This option is recommended, as it provides isolation and allows a more fine-grained control. It's necessary to install and configure AppJail on the host, as specified in the "[Getting Started](https://appjail.readthedocs.io/en/latest/getting-started/)" guide.
+2. `inherit`: This mode does not provide network isolation. From a networking perspective, it is exactly the same as running the application on the host.
+3. `none`: Completely disable the network stack.
