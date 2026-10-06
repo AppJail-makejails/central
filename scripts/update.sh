@@ -131,6 +131,10 @@ main()
             printf "## How to use this Makejail\n"
         fi
         printf "\n"
+        if [ -f "${projectdir}/is_appjail" ]; then
+            cat -- "${BASEDIR}/../template/howto.appjail" |\
+                sed -Ee "s#%%NAME%%#${escape_project}#g" || exit $?
+        fi
         printf "%s\n" "${param_howto}"
         printf "\n"
 

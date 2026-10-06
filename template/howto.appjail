@@ -1,0 +1,36 @@
+For each new release, the AppJail can be obtained as an asset. [`sysutils/bin`](https://freshports.org/sysutils/bin) is a binary manager capable of downloading, installing, and updating, making it well-suited for our purposes.
+
+```console
+$ doas pkg install -y bin
+```
+
+Install the latest version of this AppJail by running the following command:
+
+```console
+$ mkdir -p ~/bin
+$ bin install https://github.com/appjail-makejails/%%NAME%%
+```
+
+Or update it if it is already installed:
+
+```console
+$ bin update %%NAME%%.appjail
+```
+
+Assuming `~/bin` is in your `PATH`, you can run the AppJail simply by using the following command:
+
+```console
+$ %%NAME%%.appjail
+```
+
+Remember that when running an AppJail in portable mode, you must install the key used to verify the binary:
+
+```console
+$ cat << "EOF" | doas x11appjail trust dtxdf@disroot.org -
+untrusted comment: dtxdf@disroot.org (x11appjail) public key
+RWSZbdqRaZVSgICvhui+nrVbXbWw25jyZx/3lhaPzSmVi1Pgvk2DAB1h
+EOF
+$ x11appjail trusted
+KEY                                                                   COMMENT
+37e1a7da5478a29ec3d38ecb14919b107beab67cc0de0b473b5b018f018e1ccb.pub  dtxdf@disroot.org (x11appjail) public key
+```
