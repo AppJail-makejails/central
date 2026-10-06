@@ -30,6 +30,7 @@ A substitution list is used to replace values. `templates/sub/` serves as a cent
 * `notes` (optional): Notes and extra information about this Makejail. Use markdown.
 * `sub/{name}` (optional): Substitution list. Name in uppercase.
 * `daemonless.yaml` (optional): dbuild configuration to build OCI images.
+* `attr/{type}/{name}/` (optional): Attributes. Used by AppJails.
 * `is_appjail` (optional): Mark as an AppJail. [](template/workflows/release.yaml) is added to create an AppJail for each tag, powered by [`x11appjail(1)`](https://github.com/DtxdF/x11appjail).
 
 #### Keywords: {oci/environment,{arguments,environment}/{stage}}/{name}/
@@ -47,3 +48,13 @@ A substitution list is used to replace values. `templates/sub/` serves as a cent
 * `perm` (optional): volume's file mode.
 * `type` (optional): File system type.
 * `mountpoint` (optional): Path within the jail to mount the volume.
+
+#### Keywords: attr/{user,system}/{name}/
+
+* `type`: Attribute type.
+* `name`: Attribute name.
+* `descr`: Attribute description.
+
+`name` and `descr` are optional only if they are already defined in `template/attr/{type}/{name}/{name,descr}`.
+
+
