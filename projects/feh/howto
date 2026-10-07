@@ -1,0 +1,28 @@
+### Examples
+
+If you run this AppJail specifying an existing regular file on the host, it will be transferred internally via stdin to the `feh(1)` process:
+
+```console
+$ ~/bin/feh.appjail /path/to/file
+```
+
+The last argument is always used as the file. However, this AppJail handles the concept of a URL. For example, the equivalent of the previous command is as follows:
+
+```console
+$ ~/bin/feh.appjail file:///path/to/file
+```
+
+If you specify a URL using another scheme, this AppJail also detects it and uses it as-is. This means that, for example, you can open a remote image using a protocol supported by `feh(1)`:
+
+```console
+$ ~/bin/feh.appjail https://cdn.bootprint.space/mars/2.png
+$ # Or if you has been installed this AppJail:
+$ x11appjail run feh https://picsum.photos/200
+```
+
+A special form is `jail://`, which means the specified path resides within the jail.
+
+```console
+$ x11appjail transfer /path/to/myimage.jpg feh:myimage.jpg
+$ ~/bin/feh.appjail jail://myimage.jpg
+```

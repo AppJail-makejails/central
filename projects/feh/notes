@@ -1,0 +1,3 @@
+1. Since the last argument is used as the file path, `--start-at` will not work, because the mechanism actually used to transfer the file from the host to the jail is `-`, meaning standard input is employed.
+2. The file is read with the privileges of the calling process; therefore, if that process lacks permission to read the file, a "Permission Denied" error will occur, just as it would with a regular program.
+3. If the last argument is `--`, the arguments are passed as-is, without transferring any file via stdin.
