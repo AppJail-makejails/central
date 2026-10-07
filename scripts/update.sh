@@ -132,10 +132,15 @@ main()
         fi
         printf "\n"
         if [ -f "${projectdir}/is_appjail" ]; then
+            printf "### General usage\n"
+            printf "\n"
+
             cat -- "${BASEDIR}/../template/howto.appjail" |\
                 sed -Ee "s#%%NAME%%#${escape_project}#g" || exit $?
         fi
-        printf "%s\n" "${param_howto}"
+        if [ -n "${param_howto}" ]; then
+            printf "%s\n" "${param_howto}"
+        fi
         printf "\n"
 
         local stage_build=false
