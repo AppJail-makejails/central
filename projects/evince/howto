@@ -1,0 +1,25 @@
+### Examples
+
+This AppJail only works with regular files, so specify an existing one that your user can read:
+
+```console
+$ ~/bin/evince.appjail /path/to/file
+$ # Equivalent:
+$ ~/bin/evince.appjail file:///path/to/file
+```
+
+Use [Puck](https://github.com/AppJail-makejails/puck) to convert an untrusted PDF into a trusted one:
+
+```console
+$ ~/bin/evince.appjail -- --without-cache --with-puck /path/to/file
+$ # Or if you have been installed this AppJail:
+$ x11appjail run --without-cache --with-puck /path/to/file
+```
+
+Use `--help` to see a list of all available options:
+
+```console
+$ ~/bin/evince.appjail -- --help
+$ # Or if you have been installed this AppJail:
+$ x11appjail run evince --help
+```
