@@ -61,6 +61,28 @@ jobs:
             </code>
 
             🔗 <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Job Details</a>
+      - name: Check CHROME_VERSION in www/linux-widevine-cdm
+        run: |
+          cd central
+          CHROME_OUTPUT=$(./scripts/check-chrome-version.sh)
+          echo "$CHROME_OUTPUT"
+          if echo "$CHROME_OUTPUT" | grep -q '.'; then
+            echo "chrome_update=true" >> $GITHUB_OUTPUT
+          else
+            echo "chrome_update=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Notify via Telegram (CHROME_VERSION)
+        if: steps.check_chrome.outputs.chrome_update == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.telegram_chat }}
+          token: ${{ secrets.telegram_token }}
+          format: html
+          message: |
+            🚨 Our CHROME_VERSION differs from www/linux-widevine-cdm
+
+            <strong>Details</strong>:
+            ${{ steps.check_chrome.outputs.chrome_output }}
   workflow-keepalive:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
