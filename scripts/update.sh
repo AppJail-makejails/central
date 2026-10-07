@@ -432,7 +432,7 @@ main()
                 local lines
                 lines=`cat -- "${attr_descr}" | wc -l` || exit $?
 
-                echo -n "| \`${attr}\` | "
+                echo -n "| \`${attr_name}\` | "
                 if [ ${lines} -gt 1 ]; then
                     local line
                     while IFS= read -r line; do
