@@ -65,9 +65,14 @@ jobs:
         id: check_chrome
         run: |
           cd central
-          CHROME_OUTPUT=$(bash ./scripts/check-chrome-version.sh)
-          echo "$CHROME_OUTPUT"
-          if echo "$CHROME_OUTPUT" | grep -q '.'; then
+          OUTPUT=$(bash ./scripts/check-chrome-version.sh)
+          echo "$OUTPUT"
+
+          echo "output<<EOF" >> $GITHUB_OUTPUT
+          echo "$OUTPUT" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          if echo "$OUTPUT" | grep -q '.'; then
             echo "chrome_update=true" >> $GITHUB_OUTPUT
           else
             echo "chrome_update=false" >> $GITHUB_OUTPUT
@@ -83,9 +88,7 @@ jobs:
             🚨 Our CHROME_VERSION differs from www/linux-widevine-cdm
 
             <strong>Details</strong>:
-            <code>
             ${{ steps.check_chrome.outputs.chrome_output }}
-            </code>
   workflow-keepalive:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
