@@ -1,0 +1,1 @@
+1. It may be necessary to set `widget.dmabuf-webgl.enabled` to `false` in `about:config`, otherwise Firefox will fall back to software rendering.
