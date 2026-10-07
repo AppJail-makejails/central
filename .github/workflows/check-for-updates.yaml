@@ -83,7 +83,9 @@ jobs:
             🚨 Our CHROME_VERSION differs from www/linux-widevine-cdm
 
             <strong>Details</strong>:
+            <code>
             ${{ steps.check_chrome.outputs.chrome_output }}
+            </code>
   workflow-keepalive:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
