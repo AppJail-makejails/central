@@ -1,0 +1,30 @@
+### Examples
+
+If you run this AppJail specifying an existing regular file on the host, it will be transferred internally via stdin to the `mpv(1)` process:
+
+```console
+$ ~/bin/mpv.appjail /path/to/file
+```
+
+The last argument is always used as the file. However, this AppJail handles the concept of a URL. For example, the equivalent of the previous command is as follows:
+
+```console
+$ ~/bin/mpv.appjail file:///path/to/file
+```
+
+If you specify a URL using another scheme, this AppJail also detects it and uses it as-is. This means that, for example, you can open a remote image using a protocol supported by `mpv(1)`:
+
+```console
+$ ~/bin/mpv.appjail https://www.w3schools.com/html/mov_bbb.mp4
+$ # Or if you have been installed this AppJail:
+$ x11appjail run mpv https://www.w3schools.com/html/mov_bbb.mp4
+```
+
+A special form is `jail://`, which means the specified path resides within the jail.
+
+```console
+$ x11appjail transfer /path/to/my.mp4 mpv:my.mp4
+$ ~/bin/mpv.appjail jail://my.mp4
+```
+
+Since specifying a file as the first positional argument (as in the first example) uses standard input, the file is transferred via streaming. This can cause issues with the MP4 format, making direct file transfer the recommended method.
