@@ -64,7 +64,7 @@ jobs:
       - name: Check CHROME_VERSION in www/linux-widevine-cdm
         run: |
           cd central
-          CHROME_OUTPUT=$(./scripts/check-chrome-version.sh)
+          CHROME_OUTPUT=$(bash ./scripts/check-chrome-version.sh)
           echo "$CHROME_OUTPUT"
           if echo "$CHROME_OUTPUT" | grep -q '.'; then
             echo "chrome_update=true" >> $GITHUB_OUTPUT
