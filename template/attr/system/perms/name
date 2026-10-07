@@ -1,1 +1,1 @@
-users.${X11APPJAIL_UID}.perms
+users.<uid>.perms

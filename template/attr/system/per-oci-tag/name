@@ -1,1 +1,1 @@
-${X11APPJAIL_APPNAME}:${X11APPJAIL_PROFILE}.oci.tag
+<appname>:<profile>.oci.tag

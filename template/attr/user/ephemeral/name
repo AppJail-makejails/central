@@ -1,1 +1,1 @@
-${X11APPJAIL_APPNAME}:${X11APPJAIL_PROFILE}.jail.ephemeral
+<appname>:<profile>.jail.ephemeral

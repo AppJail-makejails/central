@@ -1,1 +1,1 @@
-${X11APPJAIL_APPNAME}:${X11APPJAIL_PROFILE}.labels.<label>
+<appname>:<profile>.labels.<label>
