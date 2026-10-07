@@ -62,6 +62,7 @@ jobs:
 
             🔗 <a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Job Details</a>
       - name: Check CHROME_VERSION in www/linux-widevine-cdm
+        id: check_chrome
         run: |
           cd central
           CHROME_OUTPUT=$(bash ./scripts/check-chrome-version.sh)
