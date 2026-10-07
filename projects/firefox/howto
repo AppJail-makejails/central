@@ -1,0 +1,78 @@
+### User Permissions
+
+By default, the jail lacks the necessary devices for sound, the webcam, hardware acceleration, etc., to work as expected. To achieve this, the system operator must grant the user certain permissions, and the user must allow the jail to be created with the specific permissions required for that session. This is implemented using attributes:
+
+```console
+$ UID=$(id -u)
+$ doas x11appjail sys-attr users.${UID}.perms "enable_3d sound"
+```
+
+The previous command assumes that the shell process is running with unprivileged user rights and can use `doas(1)` to elevate privileges and execute the `sys-attr` command. This command will create the attribute based on the shell process's UID, with `enable_3d` and `sound` permissions. The user-side counterpart is as follows:
+
+```console
+$ x11appjail attr put firefox:default.allow.enable_3d
+$ x11appjail attr put firefox:default.allow.sound
+```
+
+Although the user can create other attributes corresponding to actual permissions, such as `usb` or `webcam`, these are completely ignored if the system operator does not assign them.
+
+If the jail has already been created, it must be destroyed for the changes to take effect.
+
+```console
+$ x11appjail destroy-jail firefox
+```
+
+When you run this AppJail again, the devices will appear inside the jail, and sound and hardware acceleration will work as expected.
+
+### Fonts
+
+The OCI image containing all the necessary files does not install any fonts other than those essential for the application. However, this AppJail has the capability to mount system fonts in read-only mode, an operation that consumes no space.
+
+```console
+$ doas x11appjail sys-attr put mount.system-fonts
+```
+
+If the jail has already been created, it must be destroyed for the changes to take effect.
+
+```console
+$ x11appjail destroy-jail firefox
+```
+
+Once the jail is recreated, the process may take some time to generate the font cache, depending on how many fonts you have on the system.
+
+### Networking
+
+Virtual networks are the recommended option for network connectivity. They offer granular control and allow for further isolation of the jail. However, this requires configuring and installing `appjail(1)` as specified in the "[Getting Started](https://appjail.readthedocs.io/en/latest/getting-started/)" guide.
+
+```console
+$ doas x11appjail sys-attr put network.mode virtualnet
+```
+
+If you are not concerned about the complete lack of network-level isolation, you can inherit the host's network stack.
+
+```console
+$ doas x11appjail sys-attr put network.mode inherit
+```
+
+If the jail has already been created, it must be destroyed for the changes to take effect.
+
+```console
+$ x11appjail destroy-jail firefox
+```
+
+Once the jail has been recreated, you can check network connectivity by executing the following command:
+
+```console
+$ x11appjail run-cmd firefox ping -c4 1.1.1.1
+PING 1.1.1.1 (1.1.1.1): 56 data bytes
+64 bytes from 1.1.1.1: icmp_seq=0 ttl=51 time=36.769 ms
+64 bytes from 1.1.1.1: icmp_seq=1 ttl=51 time=36.617 ms
+64 bytes from 1.1.1.1: icmp_seq=2 ttl=51 time=44.956 ms
+64 bytes from 1.1.1.1: icmp_seq=3 ttl=51 time=36.360 ms
+
+--- 1.1.1.1 ping statistics ---
+4 packets transmitted, 4 packets received, 0.0% packet loss
+round-trip min/avg/max/stddev = 36.360/38.675/44.956/3.629 ms
+```
+
+The above assumes that the jail is allowed to connect to `1.1.1.1` and send ICMP packets.
