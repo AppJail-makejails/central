@@ -373,6 +373,7 @@ main()
             echo "| ${volume} | ${volume_owner} | ${volume_group} | ${volume_perm} | ${volume_type} | ${volume_mountpoint} |"
         done
 
+        local display_attr_main_header=true
         local attr_type
         for attr_type in user system; do
             local display_attr_header=true
@@ -384,10 +385,15 @@ main()
 
                 if ${display_attr_header}; then
                     echo
+                    if ${display_attr_main_header}; then
+                        echo "### Attributes"
+
+                        display_attr_main_header=false
+                    fi
                     if [ "${attr_type}" = "user" ]; then
-                        echo "### User Attributes"
+                        echo "#### User Attributes"
                     elif [ "${attr_type}" = "system" ]; then
-                        echo "### System Attributes"
+                        echo "#### System Attributes"
                     else
                         echo "Unknown attribute type: ${attr_type}" >&2
                         exit 1
