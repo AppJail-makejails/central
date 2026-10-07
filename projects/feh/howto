@@ -16,7 +16,7 @@ If you specify a URL using another scheme, this AppJail also detects it and uses
 
 ```console
 $ ~/bin/feh.appjail https://cdn.bootprint.space/mars/2.png
-$ # Or if you has been installed this AppJail:
+$ # Or if you have been installed this AppJail:
 $ x11appjail run feh https://picsum.photos/200
 ```
 
