@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -o pipefail
+
 # Update wrkdir/linux-brave/linux-brave/create after changing this.
 #PINNED_VERSION="152.0.7977.75-1"
 # Simulation.
@@ -10,7 +12,7 @@ BASEDIR=`realpath -- "${BASEDIR}"` || exit $?
 
 main()
 {
-    CURRENT_VERSION=`make -C "${PORTSDIR:-/usr/ports}/www/linux-widevine-cdm" -V CHROME_VERSION` || exit $?
+    CURRENT_VERSION=`get_chrome_version`
 
     if [ -z "${CURRENT_VERSION}" ]; then
         echo "www/linux-widevine-cdm: Could not retrieve the current version of Chrome."
@@ -22,6 +24,20 @@ main()
     fi
 
     exit 0
+}
+
+get_chrome_version()
+{
+    myfetch 'https://cgit.freebsd.org/ports/plain/www/linux-widevine-cdm/Makefile' | grep -Ee '^CHROME_VERSION=' | cut -d$'\t' -f2-
+}
+
+myfetch()
+{
+    if which -s curl; then
+        curl -fsSL -- "$1"
+    else
+        fetch -qo - -- "$1"
+    fi
 }
 
 main "$@"
