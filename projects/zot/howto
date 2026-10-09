@@ -1,0 +1,143 @@
+### Start a Zot registry
+
+#### Basic usage
+
+The image includes a default configuration that listens on port 5000 and stores data at `/var/db/zot`. Start a Zot registry with:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    ghcr.io/appjail-makejails/zot zot
+```
+
+Verify the registry is running:
+
+```console
+$ curl -i http://zot:5000/v2/
+HTTP/1.1 200 OK
+Access-Control-Allow-Headers: Authorization,content-type,X-ZOT-API-CLIENT
+Access-Control-Allow-Methods: GET,OPTIONS
+Access-Control-Allow-Origin: *
+Content-Type: application/json
+Docker-Distribution-Api-Version: registry/2.0
+Date: Fri, 09 Oct 2026 04:44:10 GMT
+Content-Length: 0
+
+```
+
+#### With persistent storage
+
+For production use, mount a volume to persist registry data:
+
+```console
+$ mkdir -p /var/appjail-volumes/zot/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/zot/data /var/db/zot" \
+    ghcr.io/appjail-makejails/zot zot
+```
+
+#### With custom configuration
+
+Mount your own Zot configuration file to `/usr/local/etc/zot/config.json`:
+
+```console
+$ mkdir -p /var/appjail-volumes/zot/data
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/zot/data /var/db/zot" \
+    -o fstab="/path/to/config.json /usr/local/etc/zot/config.json nullfs ro" \
+    ghcr.io/appjail-makejails/zot zot
+```
+
+#### AppJail Director
+
+```yaml
+options:
+  - virtualnet: ':<random> default'
+  - nat:
+
+services:
+  zot:
+    name: zot
+    makejail: gh+AppJail-makejails/zot
+    options:
+      - expose: '5000:5000'
+    volumes:
+      - data: /var/db/zot
+      - config: /usr/local/etc/zot/config.json
+
+volumes:
+  data:
+    device: /var/appjail-volumes/zot/data
+  config:
+    device: ./config.json
+    options: ro
+```
+
+### Default configuration
+
+The image ships with a minimal configuration:
+
+```json
+{
+    "storage": {
+        "rootDirectory": "/var/db/zot"
+    },
+    "http": {
+        "address": "0.0.0.0",
+        "port": "5000",
+        "compat": ["docker2s2"]
+    },
+    "log": {
+        "level": "debug"
+    }
+}
+```
+
+* `compat: ["docker2s2"]` enables Docker registry v2 compatibility for Docker CLI push/pull.
+* The registry listens on all interfaces (`0.0.0.0`) on port `5000`.
+* No authentication is configured by default. Add access control settings for production.
+
+### Web UI
+
+The UI is only served when the search and ui extensions are enabled in your configuration:
+
+```json
+{
+    "storage": {
+        "rootDirectory": "/var/db/zot"
+    },
+    "http": {
+        "address": "0.0.0.0",
+        "port": "5000",
+        "compat": ["docker2s2"]
+    },
+    "log": {
+        "level": "info"
+    },
+    "extensions" : {
+        "search": { "enable" : true },
+        "ui": { "enable" : true }
+    }
+}
+```
+
+Start the ui with that configuration:
+
+```console
+$ appjail oci run -Pd \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/path/to/config.json /usr/local/etc/zot/config.json nullfs ro" \
+    ghcr.io/appjail-makejails/zot zot
+```
+
+The UI is served at the server root. Open `http://zot:5000/` in a browser.
