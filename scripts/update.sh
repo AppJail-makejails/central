@@ -105,6 +105,10 @@ main()
             "${wrksrc}/Makejail" || exit $?
     fi
 
+    if [ -f "${projectdir}/is_appjail" ]; then
+        cp -a -- "${BASEDIR}/../template/appjail.d" "${wrksrc}/${project}/" || exit $?
+    fi
+
     mkdir -p -- "${wrksrc}/.daemonless" || exit $?
     printf "%s\n" "${param_daemonless}" > "${wrksrc}/.daemonless/config.yaml" || exit $?
 
