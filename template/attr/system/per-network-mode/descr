@@ -1,0 +1,1 @@
+Same as `network.mode`, but by application. It takes precedence when defined.
