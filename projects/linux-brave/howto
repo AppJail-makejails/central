@@ -1,3 +1,29 @@
+### Prerequisites
+
+[load-kld](https://github.com/DtxdF/AppJail/blob/main/share/examples/appjail/hooks/pre.d/load-kld.sh) and [sysctl](https://github.com/DtxdF/AppJail/blob/main/share/examples/appjail/hooks/pre.d/sysctl.sh) hooks are required for this AppJail to work.
+
+1. Be sure to set `HOOKSDIR` in your `appjail.conf(5)` file.
+
+   ```console
+   $ grep '^HOOKSDIR' /usr/local/etc/appjail/appjail.conf
+   HOOKSDIR=/usr/local/etc/appjail/hooks
+   ```
+2. Create the hooks directory if it does not exist.
+
+   ```console
+   $ mkdir -p /usr/local/etc/appjail/hooks/pre.d/
+   ```
+3. Install `load-kld` and `sysctl` hooks and set their execute bit:
+
+   ```console
+   $ fetch -o /usr/local/etc/appjail/hooks/pre.d/load-kld.sh \
+       https://github.com/DtxdF/AppJail/blob/main/share/examples/appjail/hooks/pre.d/load-kld.sh?raw=true
+   $ chmod +x /usr/local/etc/appjail/hooks/pre.d/load-kld.sh
+   $ fetch -o /usr/local/etc/appjail/hooks/pre.d/sysctl.sh \
+       https://github.com/DtxdF/AppJail/blob/main/share/examples/appjail/hooks/pre.d/sysctl.sh?raw=true
+   $ chmod +x /usr/local/etc/appjail/hooks/pre.d/sysctl.sh
+   ```
+
 ### User Permissions
 
 By default, the jail lacks the necessary devices for sound, the webcam, etc., to work as expected. To achieve this, the system operator must grant the user certain permissions, and the user must allow the jail to be created with the specific permissions required for that session. This is implemented using attributes:
