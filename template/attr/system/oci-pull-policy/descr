@@ -1,0 +1,3 @@
+Pull policy. Default is `newer`.
+
+See `--pull` in `buildah-from(1)` for details.

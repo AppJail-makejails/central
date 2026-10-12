@@ -1,0 +1,1 @@
+Same as `oci.pull-policy`, but by application. It takes precedence when defined.
