@@ -1,1 +1,1 @@
-If this attribute exists, `org.freedesktop.portal.*=@/org/freedesktop/portal/*` will not be applied in the `broadcast` policy.
+If this attribute exists, `org.freedesktop.portal.*=@/org/freedesktop/portal/*` will not be applied in the `broadcast` rule.

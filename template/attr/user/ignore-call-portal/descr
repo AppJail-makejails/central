@@ -1,1 +1,1 @@
-If this attribute exists, `org.freedesktop.portal.*=*` will not be applied in the `call` policy.
+If this attribute exists, `org.freedesktop.portal.*=*` will not be applied in the `call` rule.

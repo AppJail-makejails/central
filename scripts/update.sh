@@ -411,17 +411,17 @@ main()
 
                 attr="${attr##*/}"
 
+                local attrdir
+                attrdir="${projectdir}/attr/${attr_type}/${attr}"
+
                 local attr_name
-                if [ -f "${attr}/name" ]; then
-                    attr_name=`head -1 -- "${attr}/name"` || exit $?
+                if [ -f "${attrdir}/name" ]; then
+                    attr_name=`head -1 -- "${attrdir}/name"` || exit $?
                 elif [ -f "${BASEDIR}/../template/attr/${attr_type}/${attr}/name" ]; then
                     attr_name=`head -1 -- "${BASEDIR}/../template/attr/${attr_type}/${attr}/name"` || exit $?
                 else
                     attr_name="${attr}"
                 fi
-
-                local attrdir
-                attrdir="${projectdir}/attr/${attr_type}/${attr}"
 
                 local attr_descr
                 if [ -f "${attrdir}/descr" ]; then
