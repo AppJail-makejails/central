@@ -101,3 +101,23 @@ round-trip min/avg/max/stddev = 36.360/38.675/44.956/3.629 ms
 ```
 
 The above assumes that the jail is allowed to connect to `1.1.1.1` and send ICMP packets.
+
+### MPRIS
+
+MPRIS is enabled by default on the D-Bus proxy, so you can control the player. For example:
+
+```console
+$ playerctl -l
+brave.instance9214
+$ playerctl metadata
+brave mpris:artUrl              file:///tmp/.org.chromium.Chromium.3Bkp4N
+brave mpris:length              5094101000
+brave mpris:trackid             '/com/brave/MediaPlayer2/TrackList/Track1546EC8A3023611462AD29145D5365F2'
+brave xesam:album
+brave xesam:artist              Call For Testing
+brave xesam:title               2026-10-15 bhyve Production User Call
+$ playerctl status
+Playing
+$ playerctl status
+Paused
+```
