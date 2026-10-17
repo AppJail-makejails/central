@@ -1,0 +1,5 @@
+Configure the system bus mode. There are three modes:
+
+1. `filter`: Enables filtering.
+2. `unfiltered`: Disables filtering. This mode is insecure and is recommended only for development.
+3. `none`: Completely disables the session bus. This is the default mode unless explicitly stated otherwise.

@@ -51,3 +51,25 @@ $ x11appjail destroy-jail %%NAME%%
 ```
 
 Once you run the AppJail again, the OCI image is pulled again only if it is newer than the one on your system.
+
+### D-Bus
+
+To achieve better integration with the desktop environment, the host's D-Bus is shared via `xdg-dbus-proxy(1)`. By default, the system bus is not shared and the session bus is filtered. This happens transparently and you don't need to do anything. However, you can modify the behavior by creating user attributes that affect how AppJail interprets them when starting the D-Bus proxy.
+
+```console
+$ x11appjail attr put %%NAME%%:default.dbus-user.talk.notifications "org.freedesktop.Notifications"
+```
+
+By defining this attribute, notifications will work as if they were running on your host. Note that this is just an example, and the application running within the jail may or may not use notifications.
+
+Both the session bus and the system bus can be completely disabled by simply setting `<appname>:<profile>.dbus-user` or `<appname>:<profile>.dbus-system` to `none`. The system bus is usually disabled by default, as in most cases only the session bus is needed.
+
+```console
+$ x11appjail attr put %%NAME%%:default.dbus-user none
+```
+
+Note that if you have already started the AppJail, in order for the changes to take effect, you must destroy the jail and then run the AppJail again.
+
+```console
+$ x11appjail destroy-jail %%NAME%%
+```
