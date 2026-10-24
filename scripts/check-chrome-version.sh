@@ -3,7 +3,7 @@
 set -o pipefail
 
 # Update wrkdir/linux-brave/linux-brave/create after changing this.
-PINNED_VERSION="152.0.7977.75-1"
+PINNED_VERSION="156.0.8078.47-1"
 
 BASEDIR=`dirname -- "$0"` || exit $?
 BASEDIR=`realpath -- "${BASEDIR}"` || exit $?
