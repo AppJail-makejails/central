@@ -7,6 +7,8 @@ BASEDIR=`realpath -- "${BASEDIR}"` || exit $?
 
 main()
 {
+    cd -- "${BASEDIR}/.."
+
     ls -1 projects/*/is_appjail | sed -Ee 's#^projects/([^/]+)/is_appjail#\1#'
 }
 

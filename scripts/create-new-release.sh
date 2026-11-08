@@ -9,8 +9,10 @@ main()
     project="$1"
 
     if [ -z "${project}" ]; then
-        echo "usage: create-new-release.sh <project>" >&2
-        exit 1
+        for project in `${BASEDIR}/ls-appjails.sh`; do
+            main "${project}"
+        done
+        exit $?
     fi
 
     local wrkdir
