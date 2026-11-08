@@ -9,7 +9,7 @@ main()
 {
     cd -- "${BASEDIR}/.."
 
-    for project in `ls projects/*/is_appjail | sed -Ee 's#^projects/([^/]+)/is_appjail#\1#'`; do
+    for project in `./scripts/ls-appjails.sh`; do
         "./scripts/update.sh" "${project}" || exit $?
     done
 }
