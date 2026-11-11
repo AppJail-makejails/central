@@ -1,0 +1,1 @@
+nbdkit is an NBD server, and also a powerful toolkit for creating your own NBD servers from “unconventional” sources. nbdkit ships with many plugins for performing common tasks like serving local files.

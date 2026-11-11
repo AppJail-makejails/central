@@ -1,0 +1,40 @@
+```sh
+$ mkdir -p /var/appjail-volumes/nbdkit
+$ truncate -s 20G /var/appjail-volumes/nbdkit/data.img
+$ appjail oci run -Pd \
+    -e PUID=$(id -u) \
+    -e PGID=$(id -g) \
+    -o overwrite=force \
+    -o virtualnet=":<random> default" \
+    -o nat \
+    -o fstab="/var/appjail-volumes/nbdkit/data.img /disk" \
+    ghcr.io/appjail-makejails/nbdkit some-nbdkit \
+    -t $(nproc) -f file file=/disk fadvise=sequential
+$ # See https://www.freshports.org/filesystems/nbd-client-kmod/
+$ gnbd connect some-nbdkit
+nbd0
+$ gnbd list nbd0
+Geom name: nbd0
+ActiveConnections: 1
+Connections: 1
+TLS: no
+MaximumPayload: 33554432
+PreferredBlocksize: 4096
+MinimumBlocksize: 512
+TransmissionFlags: HAS_FLAGS, READ_ONLY, SEND_FLUSH, CAN_MULTI_CONN, SEND_CACHE
+HandshakeFlags: FIXED_NEWSTYLE, NO_ZEROES
+Size: 21474836480
+Name:
+Port: 10809
+Host: some-nbdkit
+State: CONNECTED
+Providers:
+1. Name: nbd0
+   Mediasize: 21474836480 (20G)
+   Sectorsize: 512
+   Mode: r0w0e0
+
+$ ls /dev/nbd0
+/dev/nbd0
+$ gnbd disconnect nbd0
+```
