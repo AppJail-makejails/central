@@ -7,7 +7,6 @@ build:
       args:
         FREEBSD_RELEASE: "%%BASE1%%"
         NO_PKGCLEAN: "1"
-        PORTS_GIT: "https://gitlab.com/FreeBSD/FreeBSD-ports.git"
       cache_dirs: ["%%PKGCACHE0%%"]
     - tag: %%BASE1%%-nox11
       containerfile: Containerfile.nox11
