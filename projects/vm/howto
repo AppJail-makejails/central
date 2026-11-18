@@ -1,0 +1,248 @@
+This Makejail is designed to be run by [Overlord](https://github.com/DtxdF/overlord) and supports only one virtual machine per jail. For this reason, in the remaining examples, you'll see deployment files intended for use with Overlord.
+
+### Networking
+
+Before you begin, keep in mind that this Makejail relies on [Virtual Networks](https://appjail.readthedocs.io/en/latest/getting-started/#virtual-networks). Inside the jail, NAT is used with a `192.168.8.0/24` network, with `192.168.8.1` as the gateway, so you can use any IPv4 address within your virtual machine that falls within that range. I recommend using `192.168.8.2/24`.
+
+```
++-----------------------------------------------------------------------+
+| Jail                                                                  |
+|                                                                       |
+|       +-----------------+                                             |
+|       | if_epair(4):    |          +-------------------------+        |
+| ----> | 10.0.0.5        | -------> | NAT: 192.168.8.0/24     |        |
+| <---- |                 |          +-------------------------+        |
+|       +-----------------+                       ^                     |
+|                                                 |                     |
+|                                                 v                     |
+|                                       +-------------------------+     |
+|                                       | if_bridge(4):           |     |
+|                                       | 192.168.8.1             |     |
+|                                       +-------------------------+     |
+|                                                 ^                     |
+|                                                 |                     |
+|                                                 v                     |
+|                                           +-------------+             |
+|                                           | if_tap(4)   |             |
+|                                           +-------------+             |
+|                                                 ^                     |
+|                                                 |                     |
+|       +-----------------------------------------v-------------------+ |
+|       | VM                                                          | |
+|       |                                                             | |
+|       |       +---------------------------------------------------+ | |
+|       |       | if_vnet(4):                                       | | |
+|       |       | - inet: 192.168.8.2/24                            | | |
+|       |       | - defaultrouter: 192.168.8.1                      | | |
+|       |       +---------------------------------------------------+ | |
+|       +-------------------------------------------------------------+ |
++-----------------------------------------------------------------------+
+```
+
+### Basic usage
+
+**windows10.yaml**:
+
+```yaml
+kind: vmJail
+datacenters:
+  main:
+    entrypoint: !ENV '${ENTRYPOINT}'
+    access_token: !ENV '${TOKEN}'
+deployIn:
+  labels:
+    - desktop
+vmName: 'windows10'
+makejail: 'gh+AppJail-makejails/windows10'
+overwrite: true
+options:
+  - fstab: '/var/local-os /vm/.iso nullfs ro'
+  - fstab: '/var/appjail-vm/windows10 /media'
+build-arguments:
+  - is_public_vm: '1'
+  - exclude_ports: '5900'
+template:
+  loader: 'uefi'
+  cpu: '4'
+  memory: '4G'
+  graphics: 'yes'
+  graphics_listen: '0.0.0.0'
+  graphics_res: '1280x720'
+  graphics_wait: 'no'
+  xhci_mouse: 'yes'
+  network0_type: 'virtio-net'
+  network0_switch: 'public'
+  network0_mac: '10:e7:c6:66:f8:c7'
+  utctime: 'NO'
+  wired_memory: 'YES'
+  uefi_vars: 'YES'
+  debug: 'YES'
+  disk1_type: 'nvme'
+  disk1_dev: 'custom'
+  disk1_name: '/media/data.img'
+  disk2_type: 'ahci-cd'
+  disk2_dev: 'custom'
+  disk2_name: '/vm/.iso/virtio-win.iso'
+  virt_console0: 'org.qemu.guest_agent.0'
+diskLayout:
+  driver: 'nvme'
+  size: '30G'
+  from:
+    type: 'iso'
+    isoFile: 'es-es_windows_10_enterprise_ltsc_2021_x64_dvd_51d721ea.iso'
+```
+
+**.env**:
+
+```dotenv
+ENTRYPOINT=http://127.0.0.1:8888
+TOKEN=invalid_token
+```
+
+**Console**:
+
+The deployment file above installs Windows (in this case, Windows 10 LTSC 2021), and this deployment is truly ephemeral, which means that if you run the same deployment file again, the primary disk will be completely destroyed. That is why we have connected a second disk, but this one must be created manually.
+
+```console
+$ mkdir -p /var/appjail-vm/windows10
+$ truncate -s 10G /var/appjail-vm/windows10/data.img
+$ ls /var/local-os/es-es_windows_10_enterprise_ltsc_2021_x64_dvd_51d721ea.iso
+/var/local-os/es-es_windows_10_enterprise_ltsc_2021_x64_dvd_51d721ea.iso
+$ ls /var/local-os/virtio-win.iso
+/var/local-os/virtio-win.iso
+$ overlord apply -f windows10.yml
+$ overlord get-info -f windows10/app.yml -t projects --filter-per-project
+datacenter: http://100.65.139.52:8888
+  entrypoint: main
+  chain: None
+  labels:
+    - all
+    - desktop
+    - services
+    - vm-only
+    - dc-air
+  projects:
+    windows10:
+      state: DONE
+      last_log: 2026-11-18_01h09m55s
+      locked: False
+      services:
+        - {'name': 'vm', 'status': 0, 'jail': 'windows10'}
+      up:
+        operation: COMPLETED
+        output:
+         rc: 0
+         stdout: {'errlevel': 0, 'message': None, 'failed': []}
+        last_update: 8 minutes and 16.05 seconds
+        job_id: 41
+        restarted: False
+$ overlord get-info -f windows10/app.yml -t vm --filter-per-project
+datacenter: http://100.65.139.52:8888
+  entrypoint: main
+  chain: None
+  labels:
+    - all
+    - desktop
+    - services
+    - vm-only
+    - dc-air
+  projects:
+    windows10:
+      virtual-machines:
+          operation: COMPLETED
+          output: |
+            Starting windows10
+               * found guest in /vm/windows10
+               * booting...
+          last_update: 8 minutes and 33.38 seconds
+          job_id: 41
+$ vncviewer windows10
+```
+
+The second disk, although it's attached, isn't formatted. You'll need to format it, and I recommend doing so directly from Windows.
+
+### Tor
+
+This Makejail configures the jail to act as a transparent proxy via Tor (port 9040), as a SOCKS proxy (port 9050), and as a small DNS server (port 53) using CoreDNS and Tor builtin DNS server. The only requirement is that the OCI image includes `security/tor` (which is the case for our image tagged `tor`, as you’ll see below).
+
+The virtual machine is forced to establish connections through the transparent proxy, and everything except the SOCKS proxy and the DNS server (both TCP and UDP) is blocked.
+
+The SOCKS proxy is used, for example, so that the Tor browser configures that node as a SOCKS proxy instead of using the one installed on the system, thereby avoiding sending packets through the Tor network twice and reducing performance.
+
+DNS can be used in two ways: via TCP with `options usevc` in your `resolv.conf(5)`, which forces DNS resolver to use TCP instead of UDP in unix-like systems. The other way is via the Tor DNS server (i.e., UDP); the problem is that it is limited to resolving only A, AAAA, and PTR records, but records that may be necessary, such as SRV (think of `pkg(8)`) or MX, will fail. On Windows systems, using the Tor DNS server is the only reliable option, but on unix-like systems, using TCP is recommended.
+
+```yaml
+kind: vmJail
+datacenters:
+  main:
+    entrypoint: !ENV '${ENTRYPOINT}'
+    access_token: !ENV '${TOKEN}'
+deployIn:
+  labels:
+    - desktop
+vmName: 'windows10'
+makejail: 'gh+AppJail-makejails/windows10'
+overwrite: true
+options:
+  - fstab: '/var/local-os /vm/.iso nullfs ro'
+  - fstab: '/var/appjail-vm/windows10 /media'
+build-arguments:
+  - vm_tag: 'tor'
+template:
+  loader: 'uefi'
+  cpu: '4'
+  memory: '4G'
+  graphics: 'yes'
+  graphics_listen: '0.0.0.0'
+  graphics_res: '1280x720'
+  graphics_wait: 'no'
+  xhci_mouse: 'yes'
+  network0_type: 'virtio-net'
+  network0_switch: 'public'
+  network0_mac: '10:e7:c6:66:f8:c7'
+  utctime: 'NO'
+  wired_memory: 'YES'
+  uefi_vars: 'YES'
+  debug: 'YES'
+  disk1_type: 'nvme'
+  disk1_dev: 'custom'
+  disk1_name: '/media/data.img'
+  disk2_type: 'ahci-cd'
+  disk2_dev: 'custom'
+  disk2_name: '/vm/.iso/virtio-win.iso'
+  virt_console0: 'org.qemu.guest_agent.0'
+diskLayout:
+  driver: 'nvme'
+  size: '30G'
+  from:
+    type: 'iso'
+    isoFile: 'es-es_windows_10_enterprise_ltsc_2021_x64_dvd_51d721ea.iso'
+```
+
+Unlike the first example, the `is_public_vm`, `exclude_ports`, and `pf_stricter` arguments are ignored entirely.
+
+### Running commands on the guest using vm-exec
+
+If you have configured `virt_console0: ‘org.qemu.guest_agent.0’`, you can use `vm-exec` to run commands, provided that the QEMU guest agent is installed on the guest system. `vm-exec` is simply a wrapper around `qga-guest-exec` that always configures the socket to point to the first (and therefore only) virtual machine within the jail.
+
+```console
+$ appjail cmd jexec windows10 vm list
+NAME       DATASTORE  LOADER  CPU  MEMORY  VNC           AUTO  STATE            TAGS
+windows10  default    uefi    4    4G      0.0.0.0:5900  No    Running (87500)  -
+$ appjail cmd jexec windows10 vm-exec whoami
+nt authority\system
+$ appjail cmd jexec windows10 vm-exec ipconfig
+
+Configuraci�n IP de Windows
+
+
+Adaptador de Ethernet Ethernet:
+
+   Sufijo DNS espec�fico para la conexi�n. . :
+   V�nculo: direcci�n IPv6 local. . . : fe80::b1e2:3324:39d3:6919%4
+   Direcci�n IPv4. . . . . . . . . . . . . . : 192.168.8.2
+   M�scara de subred . . . . . . . . . . . . : 255.255.255.0
+   Puerta de enlace predeterminada . . . . . : 192.168.8.1
+$ appjail cmd jexec windows10 vm-exec powershell.exe -Command "(Invoke-RestMethod -Uri 'http://ip-api.com/json').query"
+192.42.116.112
+```

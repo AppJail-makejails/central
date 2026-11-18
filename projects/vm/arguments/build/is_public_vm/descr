@@ -1,0 +1,1 @@
+When set to a non-zero value, it configures PF to redirect all TCP/UDP ports (1-65535) from the host's default interface to the VM, making it publicly accessible.

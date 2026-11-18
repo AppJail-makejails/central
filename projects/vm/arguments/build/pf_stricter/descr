@@ -1,0 +1,1 @@
+Enables stricter PF rules that block traffic on the vmbridge interface from sources outside the local subnet and block local subnet traffic destined to the bridge's own address.

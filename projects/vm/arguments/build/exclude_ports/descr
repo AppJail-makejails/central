@@ -1,0 +1,1 @@
+A single port or a PF-syntax port list (e.g., { 22, 80, 443 }) specifying ports to exclude from the NAT redirection rule, so those ports are not forwarded to the VM.
