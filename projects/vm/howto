@@ -101,7 +101,7 @@ TOKEN=invalid_token
 
 **Console**:
 
-The deployment file above installs Windows (in this case, Windows 10 LTSC 2021), and this deployment is truly ephemeral, which means that if you run the same deployment file again, the primary disk will be completely destroyed. That is why we have connected a second disk, but this one must be created manually.
+The deployment file above installs Windows (in this case, Windows 10 LTSC 2021), and this deployment is truly ephemeral, which means that if you run the same deployment file again, the primary disk will be completely destroyed. That is why we have attached a second disk, but this one must be created manually.
 
 ```console
 $ mkdir -p /var/appjail-vm/windows10
@@ -112,7 +112,7 @@ $ ls /var/local-os/virtio-win.iso
 /var/local-os/virtio-win.iso
 $ overlord apply -f windows10.yml
 $ overlord get-info -f windows10/app.yml -t projects --filter-per-project
-datacenter: http://100.65.139.52:8888
+datacenter: http://127.0.0.1:8888
   entrypoint: main
   chain: None
   labels:
@@ -137,7 +137,7 @@ datacenter: http://100.65.139.52:8888
         job_id: 41
         restarted: False
 $ overlord get-info -f windows10/app.yml -t vm --filter-per-project
-datacenter: http://100.65.139.52:8888
+datacenter: http://127.0.0.1:8888
   entrypoint: main
   chain: None
   labels:
