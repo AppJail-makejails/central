@@ -1,1 +1,1 @@
-Makejail for creating virtual machines using vm-bhyve.
+A Makejail for creating and managing full virtual machines on FreeBSD with vm-bhyve. It sets up the jail environment, configures VM networking (including a Tor-routed variant), and supports running commands inside the guest.
