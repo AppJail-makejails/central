@@ -169,7 +169,7 @@ The virtual machine is forced to establish connections through the transparent p
 
 The SOCKS proxy is used, for example, so that the Tor browser configures that node as a SOCKS proxy instead of using the one installed on the system, thereby avoiding sending packets through the Tor network twice and reducing performance.
 
-DNS can be used in two ways: via TCP with `options usevc` in your `resolv.conf(5)`, which forces DNS resolver to use TCP instead of UDP in unix-like systems. The other way is via the Tor DNS server (i.e., UDP); the problem is that it is limited to resolving only A, AAAA, and PTR records, but records that may be necessary, such as SRV (think of `pkg(8)`) or MX, will fail. On Windows systems, using the Tor DNS server is the only reliable option, but on unix-like systems, using TCP is recommended.
+DNS can be used in two ways: via TCP with `options usevc` (and defining public nameservers) in your `resolv.conf(5)`, which forces DNS resolver to use TCP instead of UDP in unix-like systems. The other way is via the Tor DNS server (i.e., UDP) and defining `192.168.8.1` as the nameserver; the problem is that it is limited to resolving only A, AAAA, and PTR records, but records that may be necessary, such as SRV (think of `pkg(8)`) or MX, will fail. On Windows systems, using the Tor DNS server is the only reliable option, but on unix-like systems, using TCP is recommended.
 
 ```yaml
 kind: vmJail
