@@ -476,3 +476,34 @@ choco install notepadplusplus -y --no-progress
 This will install Notepad++, but you can install any other package you want.
 
 ![](assets/img/choco.png)
+
+#### Persistent data
+
+As mentioned earlier, the primary drive is erased every time the vmjail is recreated, so all data stored on it is lost and you have to start from scratch. The most practical solution is to use the secondary drive created by this AppJail to store the data you want to keep. However, you'll need to make some adjustments in Windows so that programs and user data are stored on the secondary drive. Fortunately, this can be done right in the generator mentioned earlier in the "Run custom scripts > `System` scripts" section.
+
+1. ```bat
+   mkdir D:\Users
+   reg.exe add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\ProfileList" /v ProfilesDirectory /t REG_SZ /d "D:\Users" /f
+   reg.exe add "HKLM\Software\WOW6432Node\Microsoft\Windows NT\CurrentVersion\ProfileList" /v ProfilesDirectory /t REG_SZ /d "D:\Users" /f
+   ```
+
+2. ```bat
+   mkdir "D:\Program Files"
+   mkdir "D:\Program Files (x86)"
+   reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion" /v ProgramFilesDir /t REG_SZ /d "D:\Program Files" /f
+   reg.exe add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion" /v "ProgramFilesDir (x86)" /t REG_SZ /d "D:\Program Files (x86)" /f
+   reg.exe add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion" /v ProgramFilesDir /t REG_SZ /d "D:\Program Files" /f
+   ```
+
+The only problem is that the `D:` drive might not be formatted. To avoid having to install Windows just to format the disk, you can run the `x11appjail create` command, create the disk image, and then use `mkntfs` from `filesystems/ntfs` to format it.
+
+1. `x11appjail create appjail4win:win10`
+2. `truncate -s 10G /var/x11appjail/users/15000/appjail4win.win10/data.img`
+3. `md=$(doas mdconfig -at vnode -f /var/x11appjail/users/15000/appjail4win.win10/data.img)`
+4. `doas gpart create -s gpt ${md}`
+5. `doas gpart add -t ms-reserved -s 16M ${md}`
+6. `doas gpart add -t ms-basic-data ${md}`
+7. `doas env NTFS_USE_UBLIO=0 mkntfs -F -f -L "AppJail" /dev/${md}p2`
+8. `doas mdconfig -du ${md}`
+
+![](assets/img/win10-userdata.png)
