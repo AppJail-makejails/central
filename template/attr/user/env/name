@@ -1,1 +1,1 @@
-<appname>:<profile>.env.<label>.*
+<appspec>.env.<label>.*
