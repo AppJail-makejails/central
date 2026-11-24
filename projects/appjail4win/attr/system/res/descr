@@ -1,0 +1,1 @@
+Specify the resolution of the graphical console in WxH format. Only a certain range of resolutions are currently supported (see `graphics_res` in [`config.sample`](https://github.com/freebsd/vm-bhyve/blob/master/sample-templates/config.sample)). Default is `1024x768`.

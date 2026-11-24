@@ -1,0 +1,3 @@
+Storage size of the secondary disk. Default is `10G`.
+
+Please note that if this disk file does not exist, it will be created, but this only happens once. This AppJail will not change the disk size, so you must use `truncate(1)` to do so at your own risk.
