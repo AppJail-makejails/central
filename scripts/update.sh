@@ -141,6 +141,11 @@ main()
 
             cat -- "${BASEDIR}/../template/howto.appjail" |\
                 sed -Ee "s#%%NAME%%#${escape_project}#g" || exit $?
+
+            if [ -x "${wrksrc}/${project}/X" ]; then
+                cat -- "${BASEDIR}/../template/howto.x-appjail" |\
+                    sed -Ee "s#%%NAME%%#${escape_project}#g" || exit $?
+            fi
         fi
         if [ -n "${param_howto}" ]; then
             printf "%s\n" "${param_howto}"
