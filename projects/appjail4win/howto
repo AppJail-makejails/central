@@ -503,6 +503,9 @@ foreach ($regName in $folders.Keys) {
 }
 ```
 
+> [!NOTE]
+> [There may be many more folders to keep](https://learn.microsoft.com/en-us/windows/win32/shell/knownfolderid), but you probably won't need all of them.
+
 The only problem is that the `D:` drive might not be formatted. To avoid having to install Windows just to format the disk, you can run the `x11appjail create` command, create the disk image, and then use `mkntfs` from `filesystems/ntfs` to format it.
 
 1. `x11appjail create appjail4win:win10`
