@@ -479,12 +479,28 @@ This will install Notepad++, but you can install any other package you want.
 
 #### Persistent data
 
-As mentioned earlier, the primary drive is erased every time the vmjail is recreated, so all data stored on it is lost and you have to start from scratch. The most practical solution is to use the secondary drive created by this AppJail to store the data you want to keep. However, you'll need to make some adjustments in Windows so that programs and user data are stored on the secondary drive. Fortunately, this can be done right in the generator mentioned earlier in the "Run custom scripts > `System` scripts" section.
+As mentioned earlier, the primary drive is erased every time the vmjail is recreated, so all data stored on it is lost and you have to start from scratch. The most practical solution is to use the secondary drive created by this AppJail to store the data you want to keep. However, you'll need to make some adjustments in Windows so that programs and user data are stored on the secondary drive. Fortunately, this can be done right in the generator mentioned earlier in the "Run custom scripts > `DefaultUser` scripts" section.
 
-```bat
-mkdir D:\Users
-reg.exe add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\ProfileList" /v ProfilesDirectory /t REG_SZ /d "D:\Users" /f
-reg.exe add "HKLM\Software\WOW6432Node\Microsoft\Windows NT\CurrentVersion\ProfileList" /v ProfilesDirectory /t REG_SZ /d "D:\Users" /f
+```powershell
+$folders = @{
+    'Desktop'                                = 'Desktop';
+    'Personal'                               = 'Documents';
+    '{374DE290-123F-4565-9164-39C4925E467B}' = 'Downloads';
+    'My Pictures'                            = 'Pictures';
+    'My Video'                               = 'Videos';
+    'My Music'                               = 'Music';
+    'Favorites'                              = 'Favorites';
+    '{4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4}' = 'Saved Games';
+    '{56784854-C6CB-462B-8169-88E350ACB882}' = 'Contacts';
+    '{7D1D3A04-DEBB-4115-95CF-2F29DA2920DA}' = 'Searches';
+    '{BFB9D5E0-C6A9-404C-B2B2-AE6DB6AF4968}' = 'Links';
+};
+$base = 'D:\UserData\%USERNAME%';
+$userShell = 'HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders';
+foreach ($regName in $folders.Keys) {
+    $path = "$base\$($folders[$regName])";
+    reg.exe add $userShell /v $regName /t REG_EXPAND_SZ /d $path /f | Out-Null;
+}
 ```
 
 The only problem is that the `D:` drive might not be formatted. To avoid having to install Windows just to format the disk, you can run the `x11appjail create` command, create the disk image, and then use `mkntfs` from `filesystems/ntfs` to format it.
@@ -498,4 +514,26 @@ The only problem is that the `D:` drive might not be formatted. To avoid having 
 7. `doas env NTFS_USE_UBLIO=0 mkntfs -F -f -L "AppJail" /dev/${md}p2`
 8. `doas mdconfig -du ${md}`
 
-![](assets/img/win10-userdata.png)
+![](assets/img/win10-userdata-subdir.png)
+
+Although this preserves user-created data, it may still be necessary to preserve some data created by applications, such as configuration files typically found in `%APPDATA%`. You could include the following script in the “Run custom scripts > `UserOnce` scripts” section:
+
+```powershell
+$base  = "D:\UserData\$env:USERNAME\AppData"
+$links = @{
+    "$env:APPDATA\Notepad++" = "$base\Notepad++";
+}
+foreach ($link in $links.Keys) {
+    $target = $links[$link]
+    New-Item -ItemType Directory -Path $target -Force | Out-Null
+    if (Test-Path -LiteralPath $link) {
+        $item = Get-Item -LiteralPath $link -Force
+        if ($item.LinkType -eq 'Junction') { continue }
+        Get-ChildItem -LiteralPath $link -Force | Move-Item -Destination $target -Force
+        Remove-Item -LiteralPath $link -Force
+    }
+    New-Item -ItemType Junction -Path $link -Target $target | Out-Null
+}
+```
+
+![](assets/img/win10-userdata-appdata.png)
