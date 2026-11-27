@@ -260,6 +260,7 @@ options:
   - label: 'security-group:1'
   - label: 'security-group.tables.allow-dns:allow-dns'
   - label: !ENV 'security-group.rules.allow-vnc:pass out on appjail_bridge proto tcp to %i port 5900 user ${X11APPJAIL_UID}'
+  - sysrc: 'create_args_bridge0=ether 02:00:00:00:00:01'
 build-arguments:
   - is_public_vm: '1'
   - exclude_ports: '5900'
@@ -316,6 +317,7 @@ options:
   - label: 'security-group:1'
   - label: 'security-group.tables.allow-dns:allow-dns'
   - label: !ENV 'security-group.rules.allow-vnc:pass out on appjail_bridge proto tcp to %i port 5900 user ${X11APPJAIL_UID}'
+  - sysrc: 'create_args_bridge0=ether 02:00:00:00:00:01'
 build-arguments:
   - is_public_vm: '1'
   - exclude_ports: '5900'
@@ -354,6 +356,9 @@ diskLayout:
 
 There aren't many differences between `win10.yml` and `win11.yml`. What they have in common are the devices required for sound to work on the guest OS. In my case, I downloaded `virtio-win.iso`, which my `autounattend.xml` file can automatically detect and install. Other common parameters include labels related to Security Group rules, which in my case allow DNS and permit the unprivileged user to connect to the vmjail, assuming you used `--enable-pf-unprivileged-block` in `AppJail.setup`. For Windows 11, there are parameters related to the TPM, which is supposed to be exposed on your host as `/dev/tpm0`.
 
+> [!IMPORTANT]
+> Please note that if you do not configure the bridge's MAC address, the `if_bridge(4)` driver will choose a random one. Windows detects this change and, after restarting the jail, will begin referring to the network as “Network 2,” “Network 3,” and so on. However, the `sysrc` option is only available in AppJail >5.9.2.
+
 #### Tor
 
 Since this AppJail is based on [gh+AppJail-makejails/vm](https://github.com/AppJail-makejails/vm), it is possible to deploy a VM in which all traffic is routed through Tor. However, a few minor changes are required. In your `autounattend.xml` file, you must change the DNS settings to point to `192.168.8.1` instead of `172.16.0.1` (or whatever nameserver you've been using). The rest of the system attributes are similar to those of, in this case, Windows 10, but you'll need to slightly modify the template.
@@ -389,6 +394,7 @@ options:
   - label: 'security-group:1'
   - label: 'security-group.tables.allow-dns:allow-dns'
   - label: !ENV 'security-group.rules.allow-vnc:pass out on appjail_bridge proto tcp to %i port 5900 user ${X11APPJAIL_UID}'
+  - sysrc: 'create_args_bridge0=ether 02:00:00:00:00:01'
 build-arguments:
   - vm_tag: 'tor'
 template:
@@ -483,24 +489,61 @@ As mentioned earlier, the primary drive is erased every time the vmjail is recre
 
 ```powershell
 $folders = @{
-    'Desktop'                                = 'Desktop';
-    'Personal'                               = 'Documents';
-    '{374DE290-123F-4565-9164-39C4925E467B}' = 'Downloads';
-    'My Pictures'                            = 'Pictures';
-    'My Video'                               = 'Videos';
-    'My Music'                               = 'Music';
-    'Favorites'                              = 'Favorites';
-    '{4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4}' = 'Saved Games';
-    '{56784854-C6CB-462B-8169-88E350ACB882}' = 'Contacts';
-    '{7D1D3A04-DEBB-4115-95CF-2F29DA2920DA}' = 'Searches';
-    '{BFB9D5E0-C6A9-404C-B2B2-AE6DB6AF4968}' = 'Links';
-};
-$base = 'D:\UserData\%USERNAME%';
-$userShell = 'HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders';
-foreach ($regName in $folders.Keys) {
-    $path = "$base\$($folders[$regName])";
-    reg.exe add $userShell /v $regName /t REG_EXPAND_SZ /d $path /f | Out-Null;
+    'Desktop'                                = 'Desktop'
+    'Personal'                               = 'Documents'
+    '{374DE290-123F-4565-9164-39C4925E467B}' = 'Downloads'
+    'My Pictures'                            = 'Pictures'
+    'My Video'                               = 'Videos'
+    'My Music'                               = 'Music'
+    'Favorites'                              = 'Favorites'
+    '{4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4}' = 'Saved Games'
+    '{56784854-C6CB-462B-8169-88E350ACB882}' = 'Contacts'
+    '{7D1D3A04-DEBB-4115-95CF-2F29DA2920DA}' = 'Searches'
+    '{BFB9D5E0-C6A9-404C-B2B2-AE6DB6AF4968}' = 'Links'
 }
+$base = 'D:\UserData\%USERNAME%'
+$userShell = 'HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders'
+foreach ($regName in $folders.Keys) {
+    reg.exe add $userShell /v $regName /t REG_EXPAND_SZ /d "$base\$($folders[$regName])" /f | Out-Null
+}
+
+$scriptPath = 'C:\Windows\Setup\Scripts\CreateJunctions.ps1'
+$scriptContent = @'
+if (-not (Test-Path -LiteralPath 'D:\')) { return }
+
+$usf = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders')
+foreach ($name in $usf.GetValueNames()) {
+    $raw = $usf.GetValue($name, $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+    $p = [Environment]::ExpandEnvironmentVariables($raw)
+    if ($p -like 'D:\UserData\*' -and -not (Test-Path -LiteralPath $p)) {
+        New-Item -ItemType Directory -Path $p -Force | Out-Null
+    }
+}
+$usf.Close()
+
+$userBase = "D:\UserData\$env:USERNAME"
+$links = @{ "$env:APPDATA\Notepad++" = Join-Path $userBase 'AppData\Notepad++' }
+foreach ($link in $links.Keys) {
+    $target = $links[$link]
+    if (-not (Test-Path -LiteralPath $target)) { New-Item -ItemType Directory -Path $target -Force | Out-Null }
+    if (Test-Path -LiteralPath $link) {
+        $item = Get-Item -LiteralPath $link -Force
+        if ($item.LinkType -eq 'Junction') { continue }
+        Get-ChildItem -LiteralPath $link -Force | Move-Item -Destination $target -Force
+        Remove-Item -LiteralPath $link -Force
+    }
+    New-Item -ItemType Junction -Path $link -Target $target | Out-Null
+}
+'@
+New-Item -ItemType Directory -Path (Split-Path $scriptPath) -Force | Out-Null
+Set-Content -LiteralPath $scriptPath -Value $scriptContent -Encoding ASCII
+$vbs = @'
+Set sh = CreateObject("WScript.Shell")
+sh.Run "powershell.exe -ExecutionPolicy Bypass -NoProfile -File ""C:\Windows\Setup\Scripts\CreateJunctions.ps1""", 0, False
+'@
+Set-Content -LiteralPath 'C:\Windows\Setup\Scripts\CreateJunctions.vbs' -Value $vbs -Encoding ASCII
+$runCmd = 'wscript.exe "C:\Windows\Setup\Scripts\CreateJunctions.vbs"'
+reg.exe add "HKU\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Run" /v "AppJailJunctions" /t REG_SZ /d $runCmd /f
 ```
 
 > [!NOTE]
@@ -519,24 +562,87 @@ The only problem is that the `D:` drive might not be formatted. To avoid having 
 
 ![](assets/img/win10-userdata-subdir.png)
 
-Although this preserves user-created data, it may still be necessary to preserve some data created by applications, such as configuration files typically found in `%APPDATA%`. You could include the following script in the “Run custom scripts > `UserOnce` scripts” section:
-
-```powershell
-$base  = "D:\UserData\$env:USERNAME\AppData"
-$links = @{
-    "$env:APPDATA\Notepad++" = "$base\Notepad++";
-}
-foreach ($link in $links.Keys) {
-    $target = $links[$link]
-    New-Item -ItemType Directory -Path $target -Force | Out-Null
-    if (Test-Path -LiteralPath $link) {
-        $item = Get-Item -LiteralPath $link -Force
-        if ($item.LinkType -eq 'Junction') { continue }
-        Get-ChildItem -LiteralPath $link -Force | Move-Item -Destination $target -Force
-        Remove-Item -LiteralPath $link -Force
-    }
-    New-Item -ItemType Junction -Path $link -Target $target | Out-Null
-}
-```
+The scripts above preserve not only some subdirectories of the user directory, but also the Notepad++'s AppData directory. Of course, you'll need to adapt this script to your environment, but at the very least, it's a good starting point.
 
 ![](assets/img/win10-userdata-appdata.png)
+
+#### VM as template
+
+Although appjail4win creates a reproducible Windows installation in combination with an `autounattend.xml` file, it is somewhat inefficient when you have to recreate the virtual machine over and over again. An alternative is to use an IMG image with an existing Windows installation, so that you can create a virtual machine for the sole purpose of serving as a "template" and then use its disk file to create new virtual machines. However, this means you cannot use the `autounattend.xml` file on this new virtual machine. This workflow is similar to that of OCI with a `Containerfile` and an [OCI image](https://appjail.readthedocs.io/en/latest/OCI/), or to that of [AppJail images and a Makejail](https://appjail.readthedocs.io/en/latest/images/images-and-makejails/), where an image is created and then used to deploy new instances.
+
+Assuming you have `appjail4win:win10`, as mentioned in this document, you must stop the virtual machine, copy the `disk0.img` file to `/var/cache/x11appjail/appjail4win/img`, and create some system attributes for the new virtual machine. The other change is our template, which will be slightly different.
+
+1. `doas appjail cmd jexec winvm-appjail4win-15000_win10 vm stop winvm-appjail4win-15000_win10`
+2. `d=$(doas appjail cmd local winvm-appjail4win-15000_win10 realpath vm/winvm-appjail4win-15000_win10/disk0.img)`
+3. `doas cp -a "${d}" /var/cache/x11appjail/appjail4win/img/win10.img`
+4. ```console
+   $ x11appjail sys-attr put appjail4win:test.cpu 4
+   $ x11appjail sys-attr put appjail4win:test.imgfile win10.img
+   $ x11appjail sys-attr put appjail4win:test.mem 4G
+   $ x11appjail sys-attr put appjail4win:test.res 1280x720
+   $ x11appjail sys-attr put appjail4win:test.template /var/cache/x11appjail/appjail4win/templates/test.yml
+   ```
+5. `doas ./appjail4win.AppJail --install --set-option profile=test`
+6. `x11appjail run appjail4win:test`
+
+> [!INFO]
+> Depending on what you want to do, you might want to remove `appjail4win:win10` by running `x11appjail destroy-jail appjail4win:win10`, just in case you don't want to modify this virtual machine. Or, if you'd rather do it later, simply run `doas appjail jail boot off winvm-appjail4win-15000_win10`, and your virtual machine won't start at startup.
+
+**/var/cache/x11appjail/appjail4win/templates/test.yml**:
+
+```yaml
+kind: vmJail
+datacenters:
+  main:
+    entrypoint: !ENV 'http://127.0.0.1:${WINVM_OVERLORD_PORT}'
+    access_token: !ENV '${WINVM_ACCESS_TOKEN}'
+deployIn:
+  labels:
+    - !ENV '${WINVM_LABEL}'
+vmName: !ENV '${WINVM_NAME}'
+makejail: 'gh+AppJail-makejails/vm'
+overwrite: true
+options:
+  - fstab: !ENV '${WINVM_DATASTORE} /vm/.img nullfs ro'
+  - fstab: !ENV '${X11APPJAIL_USERDIR} /media'
+  - device: 'path dsp unhide'
+  - device: 'path "dsp*" unhide'
+  - label: 'security-group:1'
+  - label: 'security-group.tables.allow-dns:allow-dns'
+  - label: !ENV 'security-group.rules.allow-vnc:pass out on appjail_bridge proto tcp to %i port 5900 user ${X11APPJAIL_UID}'
+  - sysrc: 'create_args_bridge0=ether 02:00:00:00:00:01'
+build-arguments:
+  - is_public_vm: '1'
+  - exclude_ports: '5900'
+template:
+  loader: 'uefi'
+  cpu: !ENV '${WINVM_CPU}'
+  memory: !ENV '${WINVM_MEM}'
+  sound: 'yes'
+  graphics: 'yes'
+  graphics_listen: '0.0.0.0'
+  graphics_res: !ENV '${WINVM_RES}'
+  graphics_wait: 'no'
+  xhci_mouse: 'yes'
+  start_slot: '5'
+  network0_type: 'virtio-net'
+  network0_switch: 'public'
+  network0_mac: !ENV '${WINVM_MACADDR}'
+  utctime: 'NO'
+  wired_memory: 'YES'
+  uefi_vars: 'YES'
+  debug: 'YES'
+  disk1_type: 'nvme'
+  disk1_dev: 'custom'
+  disk1_name: '/media/data.img'
+  virt_console0: 'org.qemu.guest_agent.0'
+diskLayout:
+  driver: 'nvme'
+  size: !ENV '${WINVM_STORAGE}'
+  from:
+    type: 'img'
+    imgFile: !ENV '${WINVM_IMGFILE}'
+```
+
+> [!IMPORTANT]
+> In previous deployments, since we introduced `virtio-win.iso`, our network interface will use a different slot than the one specified above. Windows will detect this change and label the interface as "Ethernet 2"; furthermore, the configuration will be lost, and you'll have to reconfigure the interface manually. To avoid this, we use `start_slot`, and this way Windows will be happy.
