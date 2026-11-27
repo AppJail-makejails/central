@@ -585,7 +585,7 @@ Assuming you have `appjail4win:win10`, as mentioned in this document, you must s
 5. `doas ./appjail4win.AppJail --install --set-option profile=test`
 6. `x11appjail run appjail4win:test`
 
-> [!INFO]
+> [!TIP]
 > Depending on what you want to do, you might want to remove `appjail4win:win10` by running `x11appjail destroy-jail appjail4win:win10`, just in case you don't want to modify this virtual machine. Or, if you'd rather do it later, simply run `doas appjail jail boot off winvm-appjail4win-15000_win10`, and your virtual machine won't start at startup.
 
 **/var/cache/x11appjail/appjail4win/templates/test.yml**:
