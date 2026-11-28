@@ -33,3 +33,11 @@ build:
         PYVER: "%%PYVER%%"
         NO_PKGCLEAN: "1"
       cache_dirs: ["%%PKGCACHE0%%"]
+    - tag: %%BASE1%%-%%ODOOVER4%%
+      containerfile: Containerfile
+      args:
+        FREEBSD_RELEASE: "%%BASE1%%"
+        ODOOVER: "%%ODOOVER4%%"
+        PYVER: "%%PYVER%%"
+        NO_PKGCLEAN: "1"
+      cache_dirs: ["%%PKGCACHE0%%"]
